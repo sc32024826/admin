@@ -42,5 +42,20 @@ export default {
   tree_table_page: '树状表格',
   org_tree_page: '组织结构树',
   drag_drawer_page: '可拖动抽屉',
-  tree_select_page: '树状下拉选择器'
+  tree_select_page: '树状下拉选择器',
+
+  // 添加内容
+  setting: '基础设置',
+  employeeManage: '人员管理',
+  organization: '组织架构管理',
+  guestManage: '客户管理',
+  deviceManage: '设备管理',
+  produceManage: '生产管理',
+  orderMangee: '订单管理',
+  mission: '生产任务',
+  report: '统计报表',
+  production_report: '产量报表',
+  manage_view: '管理看板',
+  computer_state: '电脑机实时状态',
+  none: 'none'
 }

@@ -212,7 +212,19 @@ export default {
       if (e.target.value === '') this.insideTableData = this.value
     },
     handleSearch () {
-      this.insideTableData = this.value.filter(item => item[this.searchKey].indexOf(this.searchValue) > -1)
+      this.insideTableData = this.value.filter(item => item[this.searchKey].toString().indexOf(this.searchValue) > -1)
+      // this.value.filter(item =>{
+      //   //indexOf 必须是字符串 因此需要把数字转化成字符串格式
+      //  console.log(typeof  item[this.searchKey])
+      //  if(typeof  item[this.searchKey] === 'number'){
+      //    let str = item[this.searchKey].toString()
+      //    if(str.indexOf(this.searchValue)>-1) {
+      //      console.log("111")
+      //    }
+      //  }else if(item[this.searchKey].indexOf(this.searchValue)>-1) {
+      //     console.log("1")
+      //   }
+      // })
     },
     handleTableData () {
       this.insideTableData = this.value.map((item, index) => {

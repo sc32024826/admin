@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card>
-      <tables ref="tables" editable searchable search-place="top" v-model="tableData" :columns="columns" @on-delete="handleDelete"/>
+      <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-delete="handleDelete"/>
       <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
     </Card>
   </div>
@@ -18,9 +18,10 @@ export default {
   data () {
     return {
       columns: [
-        { title: 'Name', key: 'name', sortable: true },
-        { title: 'Email', key: 'email', editable: true },
-        { title: 'Create-Time', key: 'createTime' },
+        // { type: 'selection', width: '60', align: 'center', key:'sele'},  // 添加之后会造成报错
+        { title: '姓名', key: 'name', editable: true },
+        { title: '工号', key: 'id', sortable: true },
+        { title: '部门', key: 'department', editable: true },
         {
           title: 'Handle',
           key: 'handle',

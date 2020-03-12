@@ -1,5 +1,5 @@
 import Main from '@/components/main'
-import parentView from '@/components/parent-view'
+// import parentView from '@/components/parent-view'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -52,7 +52,7 @@ export default [
   },
   {
     path: '/base_setting',
-    name: '基础设置',
+    name: 'setting',
     meta: {
       icon: 'md-settings',
       title: '基础设置'
@@ -61,7 +61,7 @@ export default [
     children: [
       {
         path: 'employee',
-        name: '人员管理',
+        name: 'employeeManage',
         meta: {
           icon: 'md-people',
           title: '人员管理'
@@ -70,7 +70,7 @@ export default [
       },
       {
         path: 'organization',
-        name: '组织架构管理',
+        name: 'organization',
         meta: {
           icon: 'md-podium',
           title: '组织架构管理'
@@ -79,7 +79,7 @@ export default [
       },
       {
         path: 'guest_manage',
-        name: '客户管理',
+        name: 'guestManage',
         meta: {
           icon: 'md-contacts',
           title: '客户管理'
@@ -88,18 +88,18 @@ export default [
       },
       {
         path: 'device_manage',
-        name: '设备管理',
+        name: 'deviceManage',
         meta: {
           icon: 'ios-desktop',
           title: '设备管理'
         },
         component: () => import('@/view/components/drag-drawer')
-      },
+      }
     ]
   },
   {
     path: '/produce_manage',
-    name: '生产管理',
+    name: 'produceManage',
     meta: {
       icon: 'md-cloud-upload',
       title: '生产管理'
@@ -108,7 +108,7 @@ export default [
     children: [
       {
         path: 'order_manage',
-        name: '订单管理',
+        name: 'orderMangee',
         meta: {
           icon: 'ios-document',
           title: '订单管理'
@@ -117,7 +117,7 @@ export default [
       },
       {
         path: 'mission',
-        name: '生产任务',
+        name: 'mission',
         meta: {
           icon: 'md-clipboard',
           title: '生产任务'
@@ -128,7 +128,7 @@ export default [
   },
   {
     path: '/report',
-    name: '统计报表',
+    name: 'report',
     meta: {
       icon: 'ios-stats',
       title: '统计报表'
@@ -137,7 +137,7 @@ export default [
     children: [
       {
         path: 'production_report',
-        name: '产量报表',
+        name: 'production_report',
         meta: {
           icon: 'md-stats',
           title: '产量报表'
@@ -156,7 +156,7 @@ export default [
   },
   {
     path: '/manage_view',
-    name: '管理看板',
+    name: 'manage_view',
     meta: {
       icon: 'ios-pie',
       title: '管理看板'
@@ -165,10 +165,10 @@ export default [
     children: [
       {
         path: 'computer_state',
-        name: '电脑机实时状态',
+        name: 'computer_state',
         meta: {
           icon: 'md-pulse',
-          title: '电脑机实时状态',
+          title: '电脑机实时状态'
         },
         component: () => import('@/view/tools-methods/tools-methods.vue')
       },
@@ -178,8 +178,7 @@ export default [
         meta: {
           icon: 'md-close',
           title: 'none'
-        },
-
+        }
       }
     ]
   },
