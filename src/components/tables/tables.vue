@@ -5,7 +5,11 @@
         <Option v-for="item in columns" v-if="item.key !== 'handle'" :value="item.key" :key="`search-col-${item.key}`">{{ item.title }}</Option>
       </Select>
       <Input @on-change="handleClear" clearable placeholder="输入关键字搜索" class="search-input" v-model="searchValue"/>
-      <Button @click="handleSearch" class="search-btn" type="primary"><Icon type="search"/>&nbsp;&nbsp;搜索</Button>
+      <Button @click="handleSearch" class="search-btn" type="primary"><Icon type="ios-search"/>&nbsp;&nbsp;搜索</Button>
+    </div>
+    <div style="margin-bottom:10px">
+      <Button @click="new_employee" type="primary">新增员工</Button>&nbsp;&nbsp;
+      <Button @click="muti_delete" type="primary">批量删除</Button>
     </div>
     <Table
       ref="tablesMain"
@@ -33,6 +37,8 @@
       @on-row-click="onRowClick"
       @on-row-dblclick="onRowDblclick"
       @on-expand="onExpand"
+      @on-muti-delete="onMutiDelete"
+      @on-new-info="onNewInfo"
     >
       <slot name="header" slot="header"></slot>
       <slot name="footer" slot="footer"></slot>
@@ -40,7 +46,7 @@
     </Table>
     <div v-if="searchable && searchPlace === 'bottom'" class="search-con search-con-top">
       <Select v-model="searchKey" class="search-col">
-        <Option v-for="item in columns" v-if="item.key !== 'handle'" :value="item.key" :key="`search-col-${item.key}`">{{ item.title }}</Option>
+        <Option v-for="item in columns" v-if="item.key !== 'handle' && item.key !== 'sele'" :value="item.key" :key="`search-col-${item.key}`">{{ item.title }}</Option>
       </Select>
       <Input placeholder="输入关键字搜索" class="search-input" v-model="searchValue"/>
       <Button class="search-btn" type="primary"><Icon type="search"/>&nbsp;&nbsp;搜索</Button>
@@ -206,7 +212,7 @@ export default {
       })
     },
     setDefaultSearchKey () {
-      this.searchKey = this.columns[0].key !== 'handle' ? this.columns[0].key : (this.columns.length > 1 ? this.columns[1].key : '')
+      this.searchKey = this.columns[1].key !== 'handle' ? this.columns[1].key : (this.columns.length > 2 ? this.columns[2].key : '')
     },
     handleClear (e) {
       if (e.target.value === '') this.insideTableData = this.value
@@ -252,6 +258,7 @@ export default {
       this.$emit('on-select-all', selection)
     },
     onSelectionChange (selection) {
+      // console.log('此处触发了组件中的选项改变事件')
       this.$emit('on-selection-change', selection)
     },
     onSortChange (column, key, order) {
@@ -268,6 +275,23 @@ export default {
     },
     onExpand (row, status) {
       this.$emit('on-expand', row, status)
+    },
+    // 新增员工信息
+    new_employee () {
+      console.log('打开新增员工的抽屉')
+      this.$emit('on-new-info')
+    },
+    onNewInfo () {
+      console.log('1111')
+      this.$emit('on-new-info')
+    },
+    onMutiDelete () {
+      console.log('1111')
+      this.$emit('on-muti-delete')
+    },
+    muti_delete () {
+      console.log('在子组件触发方法,父组件监听相应的方法')
+      this.$emit('on-muti-delete')
     }
   },
   watch: {
