@@ -8,7 +8,7 @@
       <Button @click="handleSearch" class="search-btn" type="primary"><Icon type="ios-search"/>&nbsp;&nbsp;搜索</Button>
     </div>
     <div style="margin-bottom:10px">
-      <Button @click="new_employee" type="primary">新增员工</Button>&nbsp;&nbsp;
+      <Button @click="new_info" type="primary">新增信息</Button>&nbsp;&nbsp;
       <Button @click="muti_delete" type="primary">批量删除</Button>
     </div>
     <Table
@@ -277,7 +277,7 @@ export default {
       this.$emit('on-expand', row, status)
     },
     // 新增员工信息
-    new_employee () {
+    new_info () {
       console.log('打开新增员工的抽屉')
       this.$emit('on-new-info')
     },

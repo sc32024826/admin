@@ -1,15 +1,22 @@
 import axios from '@/libs/api.request'
-
+// 获取员工信息
 export const getTableData = () => {
   return axios.request({
     url: 'get_table_data',
     method: 'get'
   })
 }
-
-export const getDragList = () => {
+// 获取客户信息
+export const getGuestData = () => {
   return axios.request({
-    url: 'get_drag_list',
+    url: 'get_guest_data',
+    method: 'get'
+  })
+}
+// 获取订单信息
+export const getOrderData = () => {
+  return axios.request({
+    url: 'order_manage',
     method: 'get'
   })
 }
@@ -35,7 +42,7 @@ export const uploadImg = formData => {
     data: formData
   })
 }
-
+// 获取 组织架构
 export const getOrgData = () => {
   return axios.request({
     url: 'get_org_data',

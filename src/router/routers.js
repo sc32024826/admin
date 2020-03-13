@@ -84,7 +84,7 @@ export default [
           icon: 'md-contacts',
           title: '客户管理'
         },
-        component: () => import('@/view/components/drag-list/drag-list.vue')
+        component: () => import('@/view/guest/guest.vue')
       },
       {
         path: 'device_manage',
@@ -113,7 +113,7 @@ export default [
           icon: 'ios-document',
           title: '订单管理'
         },
-        component: () => import('@/view/update/update-table.vue')
+        component: () => import('@/view/order/order-manage.vue')
       },
       {
         path: 'mission',
