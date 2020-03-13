@@ -211,6 +211,7 @@ export default {
         return res
       })
     },
+    // 设置默认搜索字段
     setDefaultSearchKey () {
       this.searchKey = this.columns[1].key !== 'handle' ? this.columns[1].key : (this.columns.length > 2 ? this.columns[2].key : '')
     },

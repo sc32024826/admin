@@ -9,15 +9,16 @@
         search-place="top"
         v-model="tableData"
         :columns="columns"
-        @on-delete="handleDelete"
+        @on-open-details="showDeatils"
         @on-selection-change="selectionChange"
         @on-new-info="addNewEmployee"
         @on-muti-delete="deleteMany"
         @on-save-edit="paramsEdit"
+        @on-row-dblclick="onRowClick"
       />
       <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
     </Card>
-    <Drawer title="添加订单信息" v-model="drawer_new_em" width="500" :mask-closable="false">
+    <Drawer title="添加订单信息:" v-model="drawer_new_em" width="500" :mask-closable="false">
       <Form :model="formData">
         <Row :gutter="32">
           <Col span="24">
@@ -53,12 +54,49 @@
         <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
       </div>
     </Drawer>
-    <Drawer title="批量删除订单" :closable="false" v-model="drawer_deleteMany" width="400">
+    <Drawer title="批量删除订单:" :closable="false" v-model="drawer_deleteMany" width="400">
       <h2 style="color:red">是否确认删除以下订单信息:</h2>
       <h3 v-for="item in selection" :key="item">{{item.id}}</h3>
       <div class="demo-drawer-footer">
         <Button style="margin: 8px" @click=" drawer_deleteMany= false">取消</Button>
         <Button type="primary" @click="deleteConfirm()">确定</Button>
+      </div>
+    </Drawer>
+    <Drawer title="修改订单信息:" :closable="false" v-model="drawer_editinfo" width="400">
+      <Form :model="editInfo">
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="客户名称" label-position="top">
+              <Input v-model="dbclickItem.name"/>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单日期" label-position="top">
+              <DatePicker v-model="dbclickItem.startDate"></DatePicker>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="交货日期" label-position="top">
+              <DatePicker v-model="dbclickItem.endDate"></DatePicker>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单详情" label-position="top">
+
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+
+      <div class="demo-drawer-footer">
+        <Button style="margin: 8px" @click=" drawer_editinfo= false">取消</Button>
+        <Button type="primary" @click="confirmEdit">提交修改</Button>
       </div>
     </Drawer>
   </div>
@@ -81,26 +119,38 @@ export default {
           align: 'center',
           key: 'sele'
         },
-        { title: '订单号', key: 'id', sortable: true },
-        { title: '客户名称', key: 'name', editable: true },
-        { title: '订单日期', key: 'startDate', editable: true },
-        { title: '交货日期', key: 'endDate', editable: true },
-        { title: '订单详情', key: 'details', editable: true }
+        {
+          title: '订单号',
+          key: 'id',
+          sortable: true,
+          width: 150,
+          align: 'center'
+        },
+        { title: '客户名称', key: 'name' },
+        { title: '订单日期', key: 'startDate' },
+        { title: '交货日期', key: 'endDate' },
+        {
+          title: '订单详情',
+          key: 'handle',
+          options: ['delete']
+        }
       ],
       tableData: [],
       drawer_new_em: false,
       drawer_deleteMany: false,
+      drawer_editinfo: false,
       formData: {
         id: '',
         name: '',
         department: ''
       },
       selection: [],
-      allDepartment: []
+      allDepartment: [],
+      dbclickItem: {}
     }
   },
   methods: {
-    handleDelete (params) {
+    showDeatils (params) {
       console.log(params)
     },
     exportExcel () {
@@ -140,6 +190,12 @@ export default {
       // params.value
 
       // 调用axios 更新数据源
+    },
+    // 打开抽屉修改 内容
+    onRowClick (row) {
+      console.log(row)
+      this.drawer_editinfo = true
+      this.dbclickItem = row
     }
   },
   mounted () {
