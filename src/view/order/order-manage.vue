@@ -56,7 +56,7 @@
     </Drawer>
     <Drawer title="批量删除订单:" :closable="false" v-model="drawer_deleteMany" width="400">
       <h2 style="color:red">是否确认删除以下订单信息:</h2>
-      <h3 v-for="item in selection" :key="item">{{item.id}}</h3>
+      <h3 v-for="item in selection" :key="item.id">{{item.id}}</h3>
       <div class="demo-drawer-footer">
         <Button style="margin: 8px" @click=" drawer_deleteMany= false">取消</Button>
         <Button type="primary" @click="deleteConfirm()">确定</Button>
@@ -88,12 +88,12 @@
         <Row :gutter="32">
           <Col span="24">
             <FormItem label="订单详情" label-position="top">
-              <!-- <Table
+              <Table
                 :columns="crossTabCloumns"
                 :data="crossTabData"
                 border
                 :span-method="handleSpan"
-              ></Table>-->
+              ></Table>
             </FormItem>
           </Col>
         </Row>
@@ -104,7 +104,6 @@
         <Button type="primary" @click="confirmEdit(dbclickItem)">提交修改</Button>
       </div>
     </Drawer>
-    <Table :columns="crossTabCloumns" :data="crossTabData" border :span-method="handleSpan"></Table>
   </div>
 </template>
 
@@ -150,51 +149,38 @@ export default {
       dbclickItem: {},
       // 交叉表数据
       crossTabCloumns: [
-        { title: '款式', align: 'center' },
-        { title: '颜色', align: 'center' },
+        { title: '款式', key: 'style', align: 'center' },
+        { title: '颜色', key: 'color', align: 'center' },
         {
           title: '尺码',
           align: 'center',
           children: [
-            { title: 'S', align: 'center' },
-            { title: 'M', align: 'center' },
-            { title: 'L', align: 'center' }
+            { title: 'S', key: 'S', align: 'center' },
+            { title: 'M', key: 'M', align: 'center' },
+            { title: 'L', key: 'L', align: 'center' }
           ]
         }
       ],
-      crossTabData: [
-        {
-          款式: 'A款',
-          颜色: '黄色',
-          尺码: 'S',
-          数量: '3121'
-        },
-        {
-          款式: 'A款',
-          颜色: '黄色',
-          尺码: 'M',
-          数量: '1121'
-        },
-        {
-          款式: 'A款',
-          颜色: '黄色',
-          尺码: 'L',
-          数量: '1213'
-        }
-      ],
-      Rules: []
+      crossTabData: []
     }
   },
   methods: {
     // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
-    handleSpan ({ row, cloumns, rowIndex, columnsIndex }) {
-      // A款 2行
-      if (rowIndex === 0 && columnsIndex === 0) {
-        return [2, 1]
-      }
-      if (rowIndex === 2 && columnsIndex === 0) {
-        return [3, 1]
-      }
+    handleSpan ({ row, column, rowIndex, columnIndex }) {
+      // if (columnIndex === 0 && rowIndex === 0) {
+      //     return [6, 1]
+      // } else if (columnIndex === 0 && rowIndex <= 5) {
+      //     return [0, 0]
+      // }
+      // if (columnIndex === 1 && rowIndex === 0) {
+      //     return [3, 1]
+      // } else if (columnIndex === 1 && rowIndex <= 2) {
+      //     return [0, 0]
+      // } else if (columnIndex === 1 && rowIndex === 3) {
+      //     return [2, 1]
+      // } else if (columnIndex === 1 && rowIndex < 5) {
+      //     return [0, 0]
+      // }
     },
     showDeatils (params) {
       console.log(params)
@@ -239,54 +225,11 @@ export default {
     },
     // 打开抽屉修改 内容
     onRowClick (row) {
-      // console.log(row)
       this.drawer_editinfo = true
       this.dbclickItem = row
-      // 订单详情数据 object | row.details
-      // console.log(row.details)
-
-      // let ruleData = row.details[0]
-      // let style = Object.keys(ruleData) // 数组  [A款,B款]
-      // let styleCount = style.length // 款的数量
-      // console.log('一共有' + styleCount + '个款式:' + style.toString())
-      // let colorList = [] // 对应每个款式的 对应颜色 数组
-      // let sizeList = [] // 所有尺码的数组
-
-      // var color = []
-      // var styleName = ''
-      // var colorCount = 0
-      // var sizeType = []
-      // var sizeCount = 0
-      // var RowCount = 0 //表格行数 即所有款式颜色累计
-      // var rule = []
-      // for (var item in ruleData) {
-      //     color = Object.keys(ruleData[item]) //["黄色", "红色"]
-      //     styleName = ruleData[item]
-      //     colorList.push(color)
-
-      //     for (let j in ruleData[item]) {
-      //         RowCount += 1
-      //         // 遍历所有款式 所有颜色的码号,将所有衣服的码添加进 数组 sizeList 中
-      //         sizeType = Object.keys(ruleData[item][j]) // 码的数组
-      //         sizeCount = sizeType.length
-      //         console.log(j + ':' + sizeCount + '个尺码')
-      //         colorCount += sizeType.length
-      //         for (let k in sizeType) {
-      //             if (sizeList.indexOf(sizeType[k]) < 0) {
-      //                 sizeList.push(sizeType[k])
-      //             }
-      //         }
-      //     }
-      //     rule.push(RowCount) //将每个款式的颜色数量 送入数组中
-      //     RowCount = 0 //置零
-      // }
-      // console.log(rule)
-      // //console.log(sizeList) // 获得最终的columns 列 标题 即 所以码  ["S", "M", "L"]
-      // let columnsCount = sizeList.length + 2 // 表格所有列数
-      // // 设置 订单详情中 尺码表
-      // // this.crossTabCloumns[2].children = this.translate(sizeList)
-      // // 其中参数Row 决定了表格的布局规则
-      // this.Rules = rule
+      console.log(row)
+      // 将数据源 填充
+      this.crossTabData = row.details
     },
     // 订单修改提交
     confirmEdit (dbclickItem) {},
@@ -301,7 +244,9 @@ export default {
         objArr.push(obj)
       })
       return objArr
-    }
+    },
+    // 将数据源修改成需要的格式
+    TurnType (array) {}
   },
   mounted () {
     getOrderData().then(res => {

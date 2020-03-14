@@ -51,7 +51,7 @@
     </Drawer>
     <Drawer title="批量删除客户" :closable="false" v-model="drawer_deleteMany" width="400">
       <h2 style="color:red">是否确认删除以下客户的相关信息:</h2>
-      <h3 v-for="item in selection" :key="item">{{item.name}}</h3>
+      <h3 v-for="item in selection" :key="item.id">{{item.name}}</h3>
       <div class="demo-drawer-footer">
         <Button style="margin: 8px" @click=" drawer_deleteMany= false">取消</Button>
         <Button type="primary" @click="deleteConfirm()">确定</Button>

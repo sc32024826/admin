@@ -41,33 +41,47 @@ export const getOrderData = req => {
       startDate: '@DATETIME("yyyy-MM-dd")',
       endDate: '@DATETIME("yyyy-MM-dd")',
       details: [{
-        'A款': {
-          '黄色': {
-            S: 3,
-            M: 4,
-            L: 7,
-            XL: 32
-          },
-          '红色': {
-            S: 13,
-            L: 73
-          }
-        },
-        'B款': {
-          '黄色': {
-            M: 43,
-            L: 73,
-            XXL: 2
-          },
-          '红色': {
-            S: 213,
-            M: 324
-          },
-          '白色': {
-            S: 213,
-            M: 324
-          }
-        }
+        style: 'A款',
+        color: '黄色',
+        S: '121',
+        M: '13',
+        L: '12'
+      },
+      {
+        style: 'A款',
+        color: '白色',
+        S: '121',
+        M: '13'
+      },
+      {
+        style: 'A款',
+        color: '米色',
+        S: '121',
+        M: '13',
+        L: '12'
+      },
+      {
+        style: 'A款',
+        color: '黑色',
+        S: '121',
+        L: '12'
+      },
+      {
+        style: 'A款',
+        color: '率色',
+        M: '13',
+        L: '12'
+      },
+      {
+        style: 'A款',
+        color: '红色',
+        S: '121'
+      },
+      {
+        style: 'B款',
+        color: '红色',
+        S: '121',
+        M: '12'
       }]
     }))
   })
