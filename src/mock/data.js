@@ -40,7 +40,35 @@ export const getOrderData = req => {
       name: Random.csentence(10, 13),
       startDate: '@DATETIME("yyyy-MM-dd")',
       endDate: '@DATETIME("yyyy-MM-dd")',
-      details: Random.csentence(10, 13)
+      details: {
+        'A款': {
+          '黄色': {
+            S: 3,
+            M: 4,
+            L: 7,
+            XL: 32
+          },
+          '红色': {
+            S: 13,
+            L: 73
+          }
+        },
+        'B款': {
+          '黄色': {
+            M: 43,
+            L: 73,
+            XXL: 2
+          },
+          '红色': {
+            S: 213,
+            M: 324
+          },
+          '白色': {
+            S: 213,
+            M: 324
+          }
+        }
+      }
     }))
   })
   return tableData
