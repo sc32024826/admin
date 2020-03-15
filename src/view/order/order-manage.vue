@@ -111,149 +111,151 @@
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
 export default {
-  name: 'tables_page',
-  components: {
-    Tables
-  },
-  data () {
-    return {
-      columns: [
-        {
-          type: 'selection',
-          width: '60',
-          align: 'center',
-          key: 'sele'
-        },
-        {
-          title: '订单号',
-          key: 'id',
-          sortable: true,
-          width: 150,
-          align: 'center'
-        },
-        { title: '客户名称', key: 'name' },
-        { title: '订单日期', key: 'startDate' },
-        { title: '交货日期', key: 'endDate' }
-      ],
-      tableData: [],
-      drawer_new_em: false,
-      drawer_deleteMany: false,
-      drawer_editinfo: false,
-      formData: {
-        id: '',
-        name: '',
-        department: ''
-      },
-      selection: [],
-      allDepartment: [],
-      dbclickItem: {},
-      // 交叉表数据
-      crossTabCloumns: [
-        { title: '款式', key: 'style', align: 'center' },
-        { title: '颜色', key: 'color', align: 'center' },
-        {
-          title: '尺码',
-          align: 'center',
-          children: [
-            { title: 'S', key: 'S', align: 'center' },
-            { title: 'M', key: 'M', align: 'center' },
-            { title: 'L', key: 'L', align: 'center' }
-          ]
+    name: 'tables_page',
+    components: {
+        Tables
+    },
+    data() {
+        return {
+            columns: [
+                {
+                    type: 'selection',
+                    width: '60',
+                    align: 'center',
+                    key: 'sele'
+                },
+                {
+                    title: '订单号',
+                    key: 'id',
+                    sortable: true,
+                    width: 150,
+                    align: 'center'
+                },
+                { title: '客户名称', key: 'name' },
+                { title: '订单日期', key: 'startDate' },
+                { title: '交货日期', key: 'endDate' }
+            ],
+            tableData: [],
+            drawer_new_em: false,
+            drawer_deleteMany: false,
+            drawer_editinfo: false,
+            formData: {
+                id: '',
+                name: '',
+                department: ''
+            },
+            selection: [],
+            allDepartment: [],
+            dbclickItem: {},
+            // 交叉表数据
+            crossTabCloumns: [
+                { title: '款式', key: 'style', align: 'center' },
+                { title: '颜色', key: 'color', align: 'center' },
+                {
+                    title: '尺码',
+                    align: 'center',
+                    children: [
+                        { title: 'S', key: 'S', align: 'center' },
+                        { title: 'M', key: 'M', align: 'center' },
+                        { title: 'L', key: 'L', align: 'center' }
+                    ]
+                }
+            ],
+            crossTabData: []
         }
-      ],
-      crossTabData: []
+    },
+    methods: {
+        // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
+        handleSpan({ row, column, rowIndex, columnIndex }) {
+            // if (columnIndex === 0 && rowIndex === 0) {
+            //     return [6, 1]
+            // } else if (columnIndex === 0 && rowIndex <= 5) {
+            //     return [0, 0]
+            // }
+            // if (columnIndex === 1 && rowIndex === 0) {
+            //     return [3, 1]
+            // } else if (columnIndex === 1 && rowIndex <= 2) {
+            //     return [0, 0]
+            // } else if (columnIndex === 1 && rowIndex === 3) {
+            //     return [2, 1]
+            // } else if (columnIndex === 1 && rowIndex < 5) {
+            //     return [0, 0]
+            // }
+        },
+        showDeatils(params) {
+            console.log(params)
+        },
+        exportExcel() {
+            this.$refs.tables.exportCsv({
+                filename: `table-${new Date().valueOf()}.csv`
+            })
+        },
+        // 选项改变时触发
+        selectionChange(selection) {
+            this.selection = selection
+        },
+        // 打开抽屉-新建员工
+        addNewEmployee() {
+            this.drawer_new_em = true
+        },
+        employeeSubmit(formData) {
+            console.log('新增员工')
+            console.log(formData)
+
+            // axios
+        },
+        // 打开批量删除的抽屉
+        deleteMany() {
+            this.drawer_deleteMany = true
+        },
+        // 删除勾选项
+        deleteConfirm() {
+            // 勾选项 为 selection
+            // 调用axios 删除 selection 匹配的数据
+        },
+        // 修改操作
+        paramsEdit(params) {
+            console.log(params)
+            // 关键字段
+            // params.row.id
+            // 修改成
+            // params.value
+
+            // 调用axios 更新数据源
+        },
+        // 打开抽屉修改 内容
+        onRowClick(row) {
+            this.drawer_editinfo = true
+            this.dbclickItem = row
+            console.log(row)
+            // 将数据源 填充
+            this.crossTabData = row.details
+        },
+        // 订单修改提交
+        confirmEdit(dbclickItem) {},
+
+        // 将传递过来的数组 修改成 columns 数组参数
+        translate(arr) {
+            let objArr = []
+            arr.forEach(element => {
+                let obj = {}
+                obj['title'] = element
+                obj['align'] = 'center'
+                objArr.push(obj)
+            })
+            return objArr
+        },
+        // 将数据源修改成需要的格式
+        TurnType(array) {
+            console.log(array)
+        }
+    },
+    mounted() {
+        getOrderData().then(res => {
+            this.tableData = res.data
+            // this.crossTabData = this.tableData[0].details
+        })
     }
-  },
-  methods: {
-    // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
-    handleSpan ({ row, column, rowIndex, columnIndex }) {
-      // if (columnIndex === 0 && rowIndex === 0) {
-      //     return [6, 1]
-      // } else if (columnIndex === 0 && rowIndex <= 5) {
-      //     return [0, 0]
-      // }
-      // if (columnIndex === 1 && rowIndex === 0) {
-      //     return [3, 1]
-      // } else if (columnIndex === 1 && rowIndex <= 2) {
-      //     return [0, 0]
-      // } else if (columnIndex === 1 && rowIndex === 3) {
-      //     return [2, 1]
-      // } else if (columnIndex === 1 && rowIndex < 5) {
-      //     return [0, 0]
-      // }
-    },
-    showDeatils (params) {
-      console.log(params)
-    },
-    exportExcel () {
-      this.$refs.tables.exportCsv({
-        filename: `table-${new Date().valueOf()}.csv`
-      })
-    },
-    // 选项改变时触发
-    selectionChange (selection) {
-      this.selection = selection
-    },
-    // 打开抽屉-新建员工
-    addNewEmployee () {
-      this.drawer_new_em = true
-    },
-    employeeSubmit (formData) {
-      console.log('新增员工')
-      console.log(formData)
-
-      // axios
-    },
-    // 打开批量删除的抽屉
-    deleteMany () {
-      this.drawer_deleteMany = true
-    },
-    // 删除勾选项
-    deleteConfirm () {
-      // 勾选项 为 selection
-      // 调用axios 删除 selection 匹配的数据
-    },
-    // 修改操作
-    paramsEdit (params) {
-      console.log(params)
-      // 关键字段
-      // params.row.id
-      // 修改成
-      // params.value
-
-      // 调用axios 更新数据源
-    },
-    // 打开抽屉修改 内容
-    onRowClick (row) {
-      this.drawer_editinfo = true
-      this.dbclickItem = row
-      console.log(row)
-      // 将数据源 填充
-      this.crossTabData = row.details
-    },
-    // 订单修改提交
-    confirmEdit (dbclickItem) {},
-
-    // 将传递过来的数组 修改成 columns 数组参数
-    translate (arr) {
-      let objArr = []
-      arr.forEach(element => {
-        let obj = {}
-        obj['title'] = element
-        obj['align'] = 'center'
-        objArr.push(obj)
-      })
-      return objArr
-    },
-    // 将数据源修改成需要的格式
-    TurnType (array) {}
-  },
-  mounted () {
-    getOrderData().then(res => {
-      this.tableData = res.data
-      // this.crossTabData = this.tableData[0].details
-    })
-  }
 }
 </script>
 
