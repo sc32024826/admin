@@ -62,54 +62,100 @@
         <Button type="primary" @click="deleteConfirm()">确定</Button>
       </div>
     </Drawer>
-    <Drawer title="修改订单信息:" :closable="false" v-model="drawer_editinfo" width="700">
-      <Form :model="dbclickItem">
+    <Modal
+      v-model="bShowModel_details"
+      title="订单详情"
+      @on-ok="ok()"
+      @on-canccel="that.bShowModel_details = false"
+      width="90%"
+    >
+      <Form :model="order">
         <Row :gutter="32">
           <Col span="24">
             <FormItem label="客户名称" label-position="top">
-              <Input v-model="dbclickItem.name" />
+              <Input v-model="order.name" />
             </FormItem>
           </Col>
         </Row>
         <Row :gutter="32">
-          <Col span="24">
+          <Col span="12">
             <FormItem label="订单日期" label-position="top">
-              <DatePicker v-model="dbclickItem.startDate"></DatePicker>
+              <DatePicker v-model="order.startDate"></DatePicker>
             </FormItem>
           </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
+
+          <Col span="12">
             <FormItem label="交货日期" label-position="top">
-              <DatePicker v-model="dbclickItem.endDate"></DatePicker>
+              <DatePicker v-model="order.endDate"></DatePicker>
             </FormItem>
           </Col>
         </Row>
         <Row :gutter="32">
           <Col span="24">
             <FormItem label="订单详情" label-position="top">
-              <Table
-                :columns="crossTabCloumns"
-                :data="crossTabData"
-                border
-                :span-method="handleSpan"
-              ></Table>
+              <Table :columns="orderCloumns" :data="orderData" border :span-method="handleSpan"></Table>
             </FormItem>
           </Col>
         </Row>
       </Form>
-
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click="drawer_editinfo= false">取消</Button>
-        <Button type="primary" @click="confirmEdit(dbclickItem)">提交修改</Button>
-      </div>
-    </Drawer>
+      <Button style="margin: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+      <Button type="warning" @click="handleEdit()">编辑数量</Button>
+      <Button type="primary" style="margin: 10px;" @click="additem">添加条目</Button>
+      <Modal v-model="bShowModel_add" title="添加条目">
+        <Form :model="newItem">
+          <Row :gutter="32">
+            <Col span="8">
+              <FormItem label="款式" label-position="top">
+                <Select v-model="sStyle" filterable allow-create @on-create="handleCreate1">
+                  <Option
+                    v-for="(item,index) in newItem.style"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="8">
+              <FormItem label="颜色" label-position="top">
+                <Select v-model="sColor" filterable allow-create @on-create="handleCreate1">
+                  <Option
+                    v-for="(item,index) in newItem.color"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="8">
+              <FormItem label="尺码" label-position="top">
+                <Select v-model="sSize" filterable allow-create @on-create="handleCreate1">
+                  <Option
+                    v-for="(item,index) in newItem.size"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="数量" label-position="top"></FormItem>
+              <Input v-model="newItem.count" placeholder="输入件数" />
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+    </Modal>
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
+import manage from './dataSourceAction'
+import reGenrateColumns from './columns'
+
 export default {
     name: 'tables_page',
     components: {
@@ -146,80 +192,39 @@ export default {
             },
             selection: [],
             allDepartment: [],
-            dbclickItem: {},
+            order: {},
+            // 处理之后的数据
+            manageData: {
+                data: [],
+                sizeList: []
+            },
             // 交叉表数据
-            crossTabCloumns: [
+            orderCloumns: [
                 { title: '款式', key: 'style', align: 'center' },
-                { title: '颜色', key: 'color', align: 'center' },
-                {
-                    title: '尺码',
-                    align: 'center',
-                    children: [
-                        { title: 'S', key: 'S', align: 'center' },
-                        { title: 'M', key: 'M', align: 'center' },
-                        { title: 'L', key: 'L', align: 'center' }
-                    ]
-                }
+                { title: '颜色', key: 'color', align: 'center' }
             ],
-            crossTabData: []
+            // 订单详情 details
+            orderData: [],
+            // 尺码表
+            sizeList: [{ id: '', value: '' }],
+            // 控制model的开关显示
+            bShowModel_details: false,
+            bShowModel_add: false,
+            newItem: {
+                style: '',
+                color: '',
+                size: '',
+                count: ''
+            },
+            // 下拉选择器
+            sStyle: '',
+            sColor: '',
+            sSize: ''
         }
     },
     methods: {
-        // 数据统计处理, 计算订单有多少种款式,每款式有多少种颜色,多少种尺码
-        dataAction(data) {
-            let styleList = [] // 有哪些款式
-            data.forEach(item => {
-                !styleList.includes(item.style) ? styleList.push(item.style) : styleList
-            })
-			console.log(styleList)
-            // 罗列出所有款式之后 预设所有款式的跨行为0
-            let styleStep = [] // 定义每个款式的跨行
-            styleList.forEach(it => {
-                styleStep.push({
-                    style: it,
-                    step: 0
-                })
-            })
-            console.log(styleStep)
-            // 计算表格的跨行
-            data.forEach(items => {
-                styleStep.forEach(it => {
-                    items.style === it.style ? it.step++ : it.step
-                })
-            })
-            console.log('计算后的跨行结果:')
-            console.log(styleStep)
-            data.forEach(it => {
-                styleStep.forEach((n, index) => {
-                    if (it.style === n.style) {
-                        if (styleList.includes(it.style)) {
-                            it.step = n.step
-                            styleList.splice(styleList.indexOf(it.style), 1)
-                        } else {
-                            it.step = 0
-                        }
-                    }
-                })
-            })
-            console.log(data)
-            return data
-        },
         // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
         handleSpan({ row, column, rowIndex, columnIndex }) {
-            // if (columnIndex === 0 && rowIndex === 0) {
-            //     return [6, 1]
-            // } else if (columnIndex === 0 && rowIndex <= 5) {
-            //     return [0, 0]
-            // }
-            // if (columnIndex === 1 && rowIndex === 0) {
-            //     return [3, 1]
-            // } else if (columnIndex === 1 && rowIndex <= 2) {
-            //     return [0, 0]
-            // } else if (columnIndex === 1 && rowIndex === 3) {
-            //     return [2, 1]
-            // } else if (columnIndex === 1 && rowIndex < 5) {
-            //     return [0, 0]
-            // }
             if (columnIndex === 0) {
                 return {
                     rowspan: row.step === 0 ? 0 : row.step,
@@ -270,35 +275,102 @@ export default {
         },
         // 打开抽屉修改 内容
         onRowClick(row) {
-            this.drawer_editinfo = true
-            this.dbclickItem = row
+            var that = this
+            that.bShowModel_details = true
+            that.order = row
             // 将数据源 填充
-            this.crossTabData = this.dataAction(row.details)
+            that.manageData = manage(row.details)
+            // 更新交叉表 列名
+            let newColumns = that.manageData.sizeList // 新的尺码表
+            // 重新生成尺码表
+            that.orderCloumns = reGenrateColumns(newColumns)
+            // 添加 操作按钮
+            that.orderCloumns.push({
+                title: '操作',
+                align: 'center',
+                render(h, params) {
+                    return h(
+                        'Button',
+                        {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    that.remove(params.index)
+                                }
+                            }
+                        },
+                        '删除'
+                    )
+                }
+            })
+
+            // console.log(columnsNames)
+            this.orderData = this.manageData.data
+            // console.log(this.orderData)
         },
         // 订单修改提交
-        confirmEdit(dbclickItem) {},
-
-        // 将传递过来的数组 修改成 columns 数组参数
-        translate(arr) {
-            let objArr = []
-            arr.forEach(element => {
-                let obj = {}
-                obj['title'] = element
-                obj['align'] = 'center'
-                objArr.push(obj)
-            })
-            return objArr
-        },
+        confirmEdit(data) {},
         // 将数据源修改成需要的格式
         TurnType(array) {
             // console.log(array)
             return array
-        }
+        },
+        edit_count() {},
+        // 确认修改操作
+        ok() {
+            console.log(this.order)
+            // 调用axios
+        },
+        handleEdit() {},
+        // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
+        remove(index) {
+            this.orderData.splice(index, 1)
+            this.manageData = manage(this.orderData)
+        },
+        // 添加订单条目
+        additem() {
+            this.bShowModel_add = true
+            let source = this.manageData
+            let styleli = []
+            let colorli = []
+            let size = [
+                { value: 'XS' },
+                { value: 'S' },
+                { value: 'M' },
+                { value: 'L' },
+                { value: 'XL' }
+            ]
+
+            source.data.forEach(i => {
+                !styleli.includes(i.style) ? styleli.push(i.style) : styleli
+                !colorli.includes(i.color) ? colorli.push(i.color) : colorli
+            })
+            let style = []
+            styleli.forEach((v, k) => {
+                style.push({
+                    value: v
+                })
+            })
+            let color = []
+            colorli.forEach((v, k) => {
+                color.push({
+                    value: v
+                })
+            })
+            this.newItem = {
+                style: style,
+                color: color,
+                size: size
+            }
+        },
+        handleCreate1() {}
     },
     mounted() {
         getOrderData().then(res => {
             this.tableData = res.data
-            // this.crossTabData = this.tableData[0].details
         })
     }
 }

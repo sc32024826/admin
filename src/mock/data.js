@@ -46,12 +46,14 @@ export const getOrderData = req => {
         S: '121',
         M: '13',
         L: '12'
+
       },
       {
         style: 'A款',
         color: '白色',
         S: '121',
         M: '13'
+
       },
       {
         style: 'A款',
@@ -59,29 +61,41 @@ export const getOrderData = req => {
         S: '121',
         M: '13',
         L: '12'
+
       },
       {
         style: 'A款',
         color: '黑色',
         S: '121',
-        L: '12'
-      },
-      {
-        style: 'A款',
-        color: '率色',
         M: '13',
         L: '12'
       },
       {
         style: 'A款',
+        color: '率色',
+
+        S: '121',
+        M: '13',
+        L: '12'
+
+      },
+      {
+        style: 'A款',
         color: '红色',
-        S: '121'
+
+        XS: '121',
+        M: '13',
+        XL: '12'
+
       },
       {
         style: 'B款',
         color: '红色',
+
         S: '121',
-        M: '12'
+        M: '13',
+        XL: '12'
+
       }]
     }))
   })
