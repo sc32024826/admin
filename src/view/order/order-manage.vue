@@ -165,6 +165,45 @@ export default {
         }
     },
     methods: {
+        // 数据统计处理, 计算订单有多少种款式,每款式有多少种颜色,多少种尺码
+        dataAction(data) {
+            let styleList = [] // 有哪些款式
+            data.forEach(item => {
+                !styleList.includes(item.style) ? styleList.push(item.style) : styleList
+            })
+			console.log(styleList)
+            // 罗列出所有款式之后 预设所有款式的跨行为0
+            let styleStep = [] // 定义每个款式的跨行
+            styleList.forEach(it => {
+                styleStep.push({
+                    style: it,
+                    step: 0
+                })
+            })
+            console.log(styleStep)
+            // 计算表格的跨行
+            data.forEach(items => {
+                styleStep.forEach(it => {
+                    items.style === it.style ? it.step++ : it.step
+                })
+            })
+            console.log('计算后的跨行结果:')
+            console.log(styleStep)
+            data.forEach(it => {
+                styleStep.forEach((n, index) => {
+                    if (it.style === n.style) {
+                        if (styleList.includes(it.style)) {
+                            it.step = n.step
+                            styleList.splice(styleList.indexOf(it.style), 1)
+                        } else {
+                            it.step = 0
+                        }
+                    }
+                })
+            })
+            console.log(data)
+            return data
+        },
         // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
         handleSpan({ row, column, rowIndex, columnIndex }) {
             // if (columnIndex === 0 && rowIndex === 0) {
@@ -181,6 +220,12 @@ export default {
             // } else if (columnIndex === 1 && rowIndex < 5) {
             //     return [0, 0]
             // }
+            if (columnIndex === 0) {
+                return {
+                    rowspan: row.step === 0 ? 0 : row.step,
+                    colspan: row.step === 0 ? 0 : 1
+                }
+            }
         },
         showDeatils(params) {
             console.log(params)
@@ -227,9 +272,8 @@ export default {
         onRowClick(row) {
             this.drawer_editinfo = true
             this.dbclickItem = row
-            console.log(row)
             // 将数据源 填充
-            this.crossTabData = row.details
+            this.crossTabData = this.dataAction(row.details)
         },
         // 订单修改提交
         confirmEdit(dbclickItem) {},
@@ -247,7 +291,8 @@ export default {
         },
         // 将数据源修改成需要的格式
         TurnType(array) {
-            console.log(array)
+            // console.log(array)
+            return array
         }
     },
     mounted() {
