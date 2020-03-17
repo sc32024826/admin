@@ -9,144 +9,55 @@
         search-place="top"
         v-model="tableData"
         :columns="columns"
-        @on-open-details="showDeatils"
         @on-selection-change="selectionChange"
-        @on-new-info="addNewEmployee"
+        @on-new-info="openDrawer_newItem"
         @on-muti-delete="deleteMany"
         @on-save-edit="paramsEdit"
         @on-row-dblclick="onRowClick"
       />
       <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
     </Card>
-    <Drawer title="添加订单信息:" v-model="drawer_new_em" width="500" :mask-closable="false">
-      <Form :model="formData">
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="客户名称" label-position="top">
-              <Input v-model="formData.name" placeholder="请输入客户名称"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单日期" label-position="top">
-              <DatePicker placeholder="Select date" type="date"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="交货日期" label-position="top">
-              <DatePicker placeholder="Select date" type="date"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单详情" label-position="top">
-              <!-- <Input v-model="formData.tel" placeholder="请输入联系人电话"></Input> -->
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click="drawer_new_em= false">取消</Button>
-        <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
-      </div>
-    </Drawer>
-    <Drawer title="批量删除订单:" :closable="false" v-model="drawer_deleteMany" width="400">
-      <h2 style="color:red">是否确认删除以下订单信息:</h2>
-      <h3 v-for="item in selection" :key="item.id">{{item.id}}</h3>
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click=" drawer_deleteMany= false">取消</Button>
-        <Button type="primary" @click="deleteConfirm()">确定</Button>
-      </div>
-    </Drawer>
-    <Modal
-      v-model="bShowModel_details"
-      title="订单详情"
-      @on-ok="ok()"
-      @on-canccel="that.bShowModel_details = false"
-      width="90%"
-    >
-      <Form :model="order">
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="客户名称" label-position="top">
-              <Input v-model="order.name" />
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="订单日期" label-position="top">
-              <DatePicker v-model="order.startDate"></DatePicker>
-            </FormItem>
-          </Col>
-
-          <Col span="12">
-            <FormItem label="交货日期" label-position="top">
-              <DatePicker v-model="order.endDate"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单详情" label-position="top">
-              <Table :columns="orderCloumns" :data="orderData" border :span-method="handleSpan"></Table>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <Button style="margin: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
-      <Button type="warning" @click="handleEdit()">编辑数量</Button>
-      <Button type="primary" style="margin: 10px;" @click="additem">添加条目</Button>
-      <Modal v-model="bShowModel_add" title="添加条目">
-        <Form :model="newItem">
+    <Card>
+      <Modal title="添加订单" v-model="drawer_new_item" width="90%">
+        <Form :model="formData">
           <Row :gutter="32">
-            <Col span="8">
-              <FormItem label="款式" label-position="top">
-                <Select v-model="sStyle" filterable allow-create @on-create="handleCreate1">
-                  <Option
-                    v-for="(item,index) in newItem.style"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="8">
-              <FormItem label="颜色" label-position="top">
-                <Select v-model="sColor" filterable allow-create @on-create="handleCreate1">
-                  <Option
-                    v-for="(item,index) in newItem.color"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="8">
-              <FormItem label="尺码" label-position="top">
-                <Select v-model="sSize" filterable allow-create @on-create="handleCreate1">
-                  <Option
-                    v-for="(item,index) in newItem.size"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
-                </Select>
+            <Col span="24">
+              <FormItem label="客户名称" label-position="top">
+                <Input v-model="formData.name" placeholder="请输入客户名称"></Input>
               </FormItem>
             </Col>
           </Row>
           <Row :gutter="32">
             <Col span="24">
-              <FormItem label="数量" label-position="top"></FormItem>
-              <Input v-model="newItem.count" placeholder="输入件数" />
+              <FormItem label="订单日期" label-position="top">
+                <DatePicker placeholder="Select date" type="date"></DatePicker>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="交货日期" label-position="top">
+                <DatePicker placeholder="Select date" type="date"></DatePicker>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="订单详情" label-position="top">
+                <detailsTable :columns="orderColumns" :data="orderData"></detailsTable>
+              </FormItem>
             </Col>
           </Row>
         </Form>
+        <div class="demo-drawer-footer">
+          <Button style="margin: 8px" @click="drawer_new_item= false">取消</Button>
+          <Button type="primary" @click="submit(formData)">提交</Button>
+        </div>
       </Modal>
-    </Modal>
+      <Modal title="订单详情" v-model="bShowDetails">
+        <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+      </Modal>
+    </Card>
   </div>
 </template>
 
@@ -179,10 +90,28 @@ export default {
                 },
                 { title: '客户名称', key: 'name' },
                 { title: '订单日期', key: 'startDate' },
-                { title: '交货日期', key: 'endDate' }
+                { title: '交货日期', key: 'endDate' },
+                {
+                    title: '订单详情',
+                    key: 'detail',
+                    render: (h, params) => {
+                        return h(
+                            'Button',
+                            {
+                                props: { type: 'primary', size: 'small' },
+                                on: {
+                                    click: () => {
+                                        this.showDetails(params.row.details)
+                                    }
+                                }
+                            },
+                            '查看详情'
+                        )
+                    }
+                }
             ],
             tableData: [],
-            drawer_new_em: false,
+            drawer_new_item: false,
             drawer_deleteMany: false,
             drawer_editinfo: false,
             formData: {
@@ -196,10 +125,10 @@ export default {
             // 处理之后的数据
             manageData: {
                 data: [],
-                sizeList: []
+                sizeMap: []
             },
             // 交叉表数据
-            orderCloumns: [
+            orderColumns: [
                 { title: '款式', key: 'style', align: 'center' },
                 { title: '颜色', key: 'color', align: 'center' }
             ],
@@ -219,7 +148,9 @@ export default {
             // 下拉选择器
             sStyle: '',
             sColor: '',
-            sSize: ''
+            sSize: '',
+            // 打开对话框
+            bShowDetails: false
         }
     },
     methods: {
@@ -232,8 +163,21 @@ export default {
                 }
             }
         },
-        showDeatils(params) {
-            console.log(params)
+        // 显示详情页
+        showDetails(data) {
+            // 显示对话框
+            this.bShowDetails = true
+            // 需要加工数据源 获得 合并跨度
+            this.manageData = manage(data)
+            console.log(this.manageData)
+            // 更新交叉表 列名
+            let newColumns = this.manageData.sizeMap // 新的尺码表
+            console.log(newColumns)
+            // 重新生成尺码表
+            this.orderColumns = reGenrateColumns(newColumns)
+            console.log(this.orderColumns)
+            // 数据填充
+            this.orderData = this.manageData.data
         },
         exportExcel() {
             this.$refs.tables.exportCsv({
@@ -244,16 +188,12 @@ export default {
         selectionChange(selection) {
             this.selection = selection
         },
-        // 打开抽屉-新建员工
-        addNewEmployee() {
-            this.drawer_new_em = true
+        // 打开抽屉-新建item
+        openDrawer_newItem() {
+            this.drawer_new_item = true
+            console.log('显示新的抽屉')
         },
-        employeeSubmit(formData) {
-            console.log('新增员工')
-            console.log(formData)
 
-            // axios
-        },
         // 打开批量删除的抽屉
         deleteMany() {
             this.drawer_deleteMany = true
@@ -281,7 +221,7 @@ export default {
             // 将数据源 填充
             that.manageData = manage(row.details)
             // 更新交叉表 列名
-            let newColumns = that.manageData.sizeList // 新的尺码表
+            let newColumns = that.manageData.sizeMap // 新的尺码表
             // 重新生成尺码表
             that.orderCloumns = reGenrateColumns(newColumns)
             // 添加 操作按钮
@@ -306,7 +246,6 @@ export default {
                     )
                 }
             })
-
             // console.log(columnsNames)
             this.orderData = this.manageData.data
             // console.log(this.orderData)
@@ -333,40 +272,9 @@ export default {
         // 添加订单条目
         additem() {
             this.bShowModel_add = true
-            let source = this.manageData
-            let styleli = []
-            let colorli = []
-            let size = [
-                { value: 'XS' },
-                { value: 'S' },
-                { value: 'M' },
-                { value: 'L' },
-                { value: 'XL' }
-            ]
-
-            source.data.forEach(i => {
-                !styleli.includes(i.style) ? styleli.push(i.style) : styleli
-                !colorli.includes(i.color) ? colorli.push(i.color) : colorli
-            })
-            let style = []
-            styleli.forEach((v, k) => {
-                style.push({
-                    value: v
-                })
-            })
-            let color = []
-            colorli.forEach((v, k) => {
-                color.push({
-                    value: v
-                })
-            })
-            this.newItem = {
-                style: style,
-                color: color,
-                size: size
-            }
-        },
-        handleCreate1() {}
+            console.log('改变显示状态')
+            // let source = this.manageData
+        }
     },
     mounted() {
         getOrderData().then(res => {

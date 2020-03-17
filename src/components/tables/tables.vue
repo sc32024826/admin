@@ -279,7 +279,6 @@ export default {
     },
     // 新增员工信息
     new_info () {
-      console.log('打开新增员工的抽屉')
       this.$emit('on-new-info')
     },
     onNewInfo () {

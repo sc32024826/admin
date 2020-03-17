@@ -1,47 +1,45 @@
 <template>
   <div>
-    <Model v-model="bShowModel_details" title="订单详情" @on-ok="ok" @on-canccel="cancel">
-      <Table :columns="Cloumns" :data="Data" border :span-method="handleSpan">
-        <template slot-scope="{ row, index }" slot="style">
-          <span>{{ row.style }}</span>
-        </template>
+    <Modal
+      v-model="bShowModel_details"
+      title="订单详情"
+      @on-ok="ok()"
+      @on-canccel="that.bShowModel_details = false"
+      width="90%"
+    >
+      <Form :model="order">
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="客户名称" label-position="top">
+              <Input v-model="order.name" />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="12">
+            <FormItem label="订单日期" label-position="top">
+              <DatePicker v-model="order.startDate"></DatePicker>
+            </FormItem>
+          </Col>
 
-        <template slot-scope="{ row, index }" slot="color">
-          <span>{{ row.color }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="XXS">
-          <Input type="text" v-model="XXS" v-if="editIndex === true" />
-          <span v-else>{{ row.XXS }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="XS">
-          <Input type="text" v-model="XS" v-if="editIndex === true" />
-          <span v-else>{{ row.XS }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="S">
-          <Input type="text" v-model="S" v-if="editIndex === true" />
-          <span v-else>{{ row.S }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="L">
-          <Input type="text" v-model="L" v-if="editIndex === true" />
-          <span v-else>{{ row.L }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="XL">
-          <Input type="text" v-model="XL" v-if="editIndex === true" />
-          <span v-else>{{ row.XL }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="XXL">
-          <Input type="text" v-model="XXL" v-if="editIndex === true" />
-          <span v-else>{{ row.XXL }}</span>
-        </template>
-        <template slot-scope="{ row, index }" slot="XXXL">
-          <Input type="text" v-model="XXXL" v-if="editIndex === true" />
-          <span v-else>{{ row.XXXL }}</span>
-        </template>
-      </Table>
-    </Model>
-
-    <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
-    <Button @click="handleEdit(row,index)">编辑数量</Button>
+          <Col span="12">
+            <FormItem label="交货日期" label-position="top">
+              <DatePicker v-model="order.endDate"></DatePicker>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单详情" label-position="top">
+              <Table :columns="orderCloumns" :data="orderData" border :span-method="handleSpan"></Table>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <Button style="margin: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+      <Button type="warning" @click="handleEdit()">编辑数量</Button>
+      <Button type="primary" style="margin: 10px;" @click="additem">添加条目</Button>
+    </Modal>
   </div>
 </template>
 <script>

@@ -39,6 +39,7 @@ function manage(data) {
             sizeMap.splice(sizeMap.indexOf(e), 1)
         }
     })
+    console.log(sizeMap)
     // 罗列出所有款式之后 预设所有款式的跨行为0
     let styleStep = [] // 定义每个款式的跨行
     styleList.forEach(it => {
@@ -67,7 +68,7 @@ function manage(data) {
     })
     return {
         data,
-        sizeList
+        sizeMap
     }
 }
 
