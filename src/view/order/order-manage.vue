@@ -44,7 +44,7 @@
           <Row :gutter="32">
             <Col span="24">
               <FormItem label="订单详情" label-position="top">
-                <detailsTable :columns="orderColumns" :data="orderData"></detailsTable>
+                <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
               </FormItem>
             </Col>
           </Row>
@@ -56,6 +56,111 @@
       </Modal>
       <Modal title="订单详情" v-model="bShowDetails">
         <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+      </Modal>
+      <Modal
+        v-model="bShowModel_details"
+        title="订单详情"
+        @on-ok="ok()"
+        @on-canccel="that.bShowModel_details = false"
+        width="90%"
+      >
+        <Form :model="order">
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="客户名称" label-position="top">
+                <Input v-model="order.name" />
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="12">
+              <FormItem label="订单日期" label-position="top">
+                <DatePicker v-model="order.startDate"></DatePicker>
+              </FormItem>
+            </Col>
+
+            <Col span="12">
+              <FormItem label="交货日期" label-position="top">
+                <DatePicker v-model="order.endDate"></DatePicker>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="订单详情" label-position="top">
+                <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+        <Button style="margin: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+        <Button type="warning" @click="handleEdit()">编辑数量</Button>
+        <Button type="primary" style="margin: 10px;" @click="additem">添加条目</Button>
+      </Modal>
+      <Modal
+        v-model="bShowModel_add"
+        title="新增条目"
+        @on-ok="addnewitemok"
+        @on-cancel="this.bShowModel_add = false"
+      >
+        <Form :model="newItem">
+          <Row :gutter="32">
+            <Col span="8">
+              <FormItem label="款式" label-position="top">
+                <Select
+                  v-model="current_style"
+                  filterable
+                  allow-create
+                  @on-create="handleCreate_style"
+                >
+                  <Option
+                    v-for="(item,index) in newItem.style"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="8">
+              <FormItem label="颜色" label-position="top">
+                <Select
+                  v-model="current_color"
+                  filterable
+                  allow-create
+                  @on-create="handleCreate_color"
+                >
+                  <Option
+                    v-for="(item,index) in newItem.color"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="8">
+              <FormItem label="尺码" label-position="top">
+                <Select
+                  v-model="current_size"
+                  filterable
+                  allow-create
+                  @on-create="handleCreate_size"
+                >
+                  <Option
+                    v-for="(item,index) in newItem.size"
+                    :key="index"
+                    :value="item.value"
+                  >{{item.value}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+          <Row :gutter="32">
+            <Col span="24">
+              <FormItem label="数量" label-position="top"></FormItem>
+              <Input v-model="newItem.count" placeholder="输入件数" />
+            </Col>
+          </Row>
+        </Form>
       </Modal>
     </Card>
   </div>
@@ -139,16 +244,16 @@ export default {
             // 控制model的开关显示
             bShowModel_details: false,
             bShowModel_add: false,
+            // 下拉选择器当前显示的内容
             newItem: {
                 style: '',
                 color: '',
                 size: '',
                 count: ''
             },
-            // 下拉选择器
-            sStyle: '',
-            sColor: '',
-            sSize: '',
+            current_style: '',
+            current_color: '',
+            current_size: '',
             // 打开对话框
             bShowDetails: false
         }
@@ -223,9 +328,9 @@ export default {
             // 更新交叉表 列名
             let newColumns = that.manageData.sizeMap // 新的尺码表
             // 重新生成尺码表
-            that.orderCloumns = reGenrateColumns(newColumns)
+            that.orderColumns = reGenrateColumns(newColumns)
             // 添加 操作按钮
-            that.orderCloumns.push({
+            that.orderColumns.push({
                 title: '操作',
                 align: 'center',
                 render(h, params) {
@@ -273,7 +378,63 @@ export default {
         additem() {
             this.bShowModel_add = true
             console.log('改变显示状态')
-            // let source = this.manageData
+            // 定义一个数组 用于存放下拉选择器可选项的数组
+            let styleli = []
+            let colorli = []
+            let size = [{ value: 'S' }, { value: 'M' }, { value: 'L' }]
+            // console.log(this.orderData)
+            this.orderData.forEach(i => {
+                !styleli.includes(i.style) ? styleli.push(i.style) : styleli
+                !colorli.includes(i.color) ? colorli.push(i.color) : colorli
+            })
+            let style = []
+            styleli.forEach((v, k) => {
+                style.push({
+                    value: v
+                })
+            })
+            let color = []
+            colorli.forEach((v, k) => {
+                color.push({
+                    value: v
+                })
+            })
+            this.newItem = {
+                style: style,
+                color: color,
+                size: size
+            }
+        },
+        handleCreate_style(val) {
+            // console.log(val)
+            // console.log(this.newItem.style)
+            this.newItem.style.push({ value: val })
+        },
+        handleCreate_color(val) {
+            this.newItem.color.push({ value: val })
+        },
+        handleCreate_size(val) {
+            this.newItem.size.push({ value: val })
+        },
+        addnewitemok() {
+            // 新增的数量
+            // this.newItem.count
+            // 新增的款式
+            // this.current_style
+            // 新增的颜色
+            // this.current_color
+            // 新增的尺码
+            let sizeName = this.current_size.toUpperCase()
+            let item = {
+                style: this.current_style,
+                color: this.current_color
+            }
+            item[sizeName] = this.newItem.count
+            // 需要将这个新的数据 添加进 数据源中
+            this.orderData.push(item)
+            // 如果添加的款式 已经存在,则需要重新计算合并规则
+            // if(this.current_style)
+            console.log(this.newItem.style)
         }
     },
     mounted() {

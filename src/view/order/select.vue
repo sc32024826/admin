@@ -1,7 +1,7 @@
 <template>
   <div>
     <Modal v-model="addNewItem" :title="title" :open="addNewItem">
-      <!-- <Form :model="newItem">
+      <Form :model="newItem">
         <Row :gutter="32">
           <Col span="8">
             <FormItem label="款式" label-position="top">
@@ -53,7 +53,7 @@
             <Input v-model="newItem.count" placeholder="输入件数" />
           </Col>
         </Row>
-      </Form>-->
+      </Form>
     </Modal>
   </div>
 </template>
