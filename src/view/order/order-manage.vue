@@ -66,7 +66,7 @@
       >
         <Form :model="order">
           <Row :gutter="32">
-            <Col span="24">
+            <Col span="8">
               <FormItem label="客户名称" label-position="top">
                 <Input v-model="order.name" />
               </FormItem>
@@ -93,25 +93,27 @@
             </Col>
           </Row>
         </Form>
-        <Button style="margin: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
-        <Button type="warning" @click="handleEdit()">编辑数量</Button>
-        <Button type="primary" style="margin: 10px;" @click="additem">添加条目</Button>
+        <Button style="margin-right: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+        <Button style="margin-right: 10px;" type="warning" @click="handleEdit()">编辑数量</Button>
+        <Button type="primary" @click="additem">添加条目</Button>
       </Modal>
       <Modal
         v-model="bShowModel_add"
         title="新增条目"
+        :mask-closable="false"
         @on-ok="addnewitemok"
-        @on-cancel="this.bShowModel_add = false"
+        @on-cancel="bShowModel_add = false"
       >
         <Form :model="newItem">
           <Row :gutter="32">
-            <Col span="8">
+            <Col span="12">
               <FormItem label="款式" label-position="top">
                 <Select
                   v-model="current_style"
                   filterable
                   allow-create
                   @on-create="handleCreate_style"
+                  @blur="handleCreate_style"
                 >
                   <Option
                     v-for="(item,index) in newItem.style"
@@ -121,13 +123,14 @@
                 </Select>
               </FormItem>
             </Col>
-            <Col span="8">
+            <Col span="12">
               <FormItem label="颜色" label-position="top">
                 <Select
                   v-model="current_color"
                   filterable
                   allow-create
                   @on-create="handleCreate_color"
+                  @blur="handleCreate_color"
                 >
                   <Option
                     v-for="(item,index) in newItem.color"
@@ -137,30 +140,28 @@
                 </Select>
               </FormItem>
             </Col>
-            <Col span="8">
+          </Row>
+          <Row :gutter="10">
+            <Col span="8" v-for="(item, index) in current_size" :key="index">
               <FormItem label="尺码" label-position="top">
                 <Select
-                  v-model="current_size"
+                  v-model="item.s"
                   filterable
                   allow-create
                   @on-create="handleCreate_size"
+                  @blur="handleCreate_size"
                 >
-                  <Option
-                    v-for="(item,index) in newItem.size"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
+                  <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
                 </Select>
+              </FormItem>
+              <FormItem label="数量" label-position="top">
+                <Input v-model="item.v" placeholder="输入件数" />
               </FormItem>
             </Col>
           </Row>
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="数量" label-position="top"></FormItem>
-              <Input v-model="newItem.count" placeholder="输入件数" />
-            </Col>
-          </Row>
         </Form>
+        <Button type="primary" style="margin-right: 10px;" @click="addSize()">新增尺码</Button>
+        <Button type="warning" @click="removeSize()">减少尺码</Button>
       </Modal>
     </Card>
   </div>
@@ -200,18 +201,34 @@ export default {
                     title: '订单详情',
                     key: 'detail',
                     render: (h, params) => {
-                        return h(
-                            'Button',
-                            {
-                                props: { type: 'primary', size: 'small' },
-                                on: {
-                                    click: () => {
-                                        this.showDetails(params.row.details)
+                        return [
+                            h(
+                                'Button',
+                                {
+                                    props: { type: 'primary', size: 'small' },
+                                    style: { 'margin': '2px' },
+                                    on: {
+                                        click: () => {
+                                            this.showDetails(params.row.details)
+                                        }
                                     }
-                                }
-                            },
-                            '查看详情'
-                        )
+                                },
+                                '查看详情'
+                            ),
+                            h(
+                                'Button',
+                                {
+                                    props: { type: 'warning', size: 'small' },
+                                    style: { 'margin': '2px' },
+                                    on: {
+                                        click: () => {
+                                            this.onRowClick(params.row)
+                                        }
+                                    }
+                                },
+                                '修改内容'
+                            )
+                        ]
                     }
                 }
             ],
@@ -248,12 +265,11 @@ export default {
             newItem: {
                 style: '',
                 color: '',
-                size: '',
-                count: ''
+                size: ''
             },
             current_style: '',
             current_color: '',
-            current_size: '',
+            current_size: [],
             // 打开对话框
             bShowDetails: false
         }
@@ -406,35 +422,41 @@ export default {
             }
         },
         handleCreate_style(val) {
-            // console.log(val)
+            console.log('增加款式' + val)
             // console.log(this.newItem.style)
-            this.newItem.style.push({ value: val })
+            this.newItem.style.push({ value: val, label: val })
         },
         handleCreate_color(val) {
-            this.newItem.color.push({ value: val })
+            console.log('增加颜色' + val)
+            this.newItem.color.push({ value: val, label: val })
         },
         handleCreate_size(val) {
-            this.newItem.size.push({ value: val })
+            console.log('增加尺码' + val)
+            this.newItem.size.push({ value: val, label: val })
         },
         addnewitemok() {
-            // 新增的数量
-            // this.newItem.count
-            // 新增的款式
-            // this.current_style
-            // 新增的颜色
-            // this.current_color
-            // 新增的尺码
-            let sizeName = this.current_size.toUpperCase()
             let item = {
                 style: this.current_style,
                 color: this.current_color
             }
-            item[sizeName] = this.newItem.count
+            this.current_size.forEach((v, k) => {
+                // v.s 标识尺码号  v.v 表示该尺码数量
+                item[v.s] = v.v
+            })
+            console.log(item)
             // 需要将这个新的数据 添加进 数据源中
             this.orderData.push(item)
             // 如果添加的款式 已经存在,则需要重新计算合并规则
             // if(this.current_style)
-            console.log(this.newItem.style)
+            // console.log(this.newItem.style)
+        },
+        // 新增一个尺码
+        addSize() {
+            // console.log(this.current_size)
+            this.current_size.push({ s: '输入尺码', v: '' })
+        },
+        removeSize() {
+            this.current_size.pop()
         }
     },
     mounted() {
