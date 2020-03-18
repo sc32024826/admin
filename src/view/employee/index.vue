@@ -12,7 +12,7 @@
       @on-new-info="addNewEmployee"
       @on-muti-delete="deleteObject"
     />
-    <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+    <Button style="margin: 10px 0;" icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
     <Drawer title="新增员工信息" v-model="drawer_new_em" width="720" :mask-closable="false">
       <Form :model="formData">
         <Row :gutter="32">
@@ -46,21 +46,20 @@
         <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
       </div>
     </Drawer>
-    <Card>
-      <Modal
-        v-model="bDelete"
-        title="您确认要删除以下内容吗?"
-        @on-ok="confirmToDelete"
-        @on-cancel="bDelete = false"
-      >
-        <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
-      </Modal>
-    </Card>
+    <Modal
+      v-model="bDelete"
+      title="您确认要删除以下内容吗?"
+      @on-ok="confirmToDelete"
+      @on-cancel="bDelete = false"
+    >
+      <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+    </Modal>
   </div>
 </template>
 <script>
 import Tables from '_c/tables'
 import { getEmployeeData } from '@/api/data'
+import excel from '@/libs/excel'
 
 export default {
     name: 'employee',
@@ -87,7 +86,7 @@ export default {
                                     'Button',
                                     {
                                         props: {
-                                            type: 'primary',
+                                            type: 'warning',
                                             size: 'small'
                                         },
                                         style: { 'margin-right': '2px' },
@@ -136,7 +135,10 @@ export default {
                     { title: '姓名', key: 'name' }
                 ],
                 data: []
-            }
+            },
+            exportLoading: false
+            // 分页
+            // totalPage: 0
         }
     },
     methods: {
@@ -151,15 +153,27 @@ export default {
                         : list
                 })
             }
-            console.log(list)
         },
         exportExcel() {
-            this.$refs.tables.exportCsv({
-                filename: `table-${new Date().valueOf()}.csv`
-            })
-        },
-        handleDelete(params) {
-            console.log(params)
+            if (this.tableData.length) {
+                this.exportLoading = true
+                let dataCopy = this.tableData.slice(0)
+                // 遇到长数字 比如身份证时需要在数字前添加'\t' 否则cvs显示会异常
+                dataCopy.forEach(v => {
+                    v.id = '\t' + v.id
+                })
+                const params = {
+                    title: ['工号', '姓名', '部门'],
+                    key: ['id', 'name', 'department'],
+                    data: dataCopy,
+                    autoWidth: true,
+                    filename: '员工表'
+                }
+                excel.export_array_to_excel(params)
+                this.exportLoading = false
+            } else {
+                this.$Message.info('表格数据不能为空！')
+            }
         },
         // 选项改变时触发
         selectionChange(selection) {

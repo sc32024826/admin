@@ -37,7 +37,7 @@ export const getOrderData = req => {
   doCustomTimes(5, () => {
     tableData.push(Mock.mock({
       id: Random.increment(10),
-      name: Random.csentence(10, 13),
+      name: Random.city(false) + Random.cword(3, 4) + '有限公司',
       startDate: '@DATETIME("yyyy-MM-dd")',
       endDate: '@DATETIME("yyyy-MM-dd")',
       details: [{

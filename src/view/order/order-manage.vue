@@ -14,7 +14,12 @@
         @on-muti-delete="deleteObject"
         @on-row-dblclick="onRowClick"
       />
-      <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
+      <Button
+        style="margin: 10px 0;"
+        icon="md-download"
+        :loading="exportLoading"
+        @click="exportExcel"
+      >导出为Csv文件</Button>
     </Card>
     <Card>
       <Modal title="添加订单" v-model="drawer_new_item" width="90%">
@@ -179,6 +184,7 @@ import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
 import manage from './dataSourceAction'
 import reGenrateColumns from './columns'
+import excel from '@/libs/excel'
 
 export default {
     name: 'tables_page',
@@ -265,6 +271,7 @@ export default {
             tableData: [],
             drawer_new_item: false,
             drawer_editinfo: false,
+            exportLoading: false,
             formData: {
                 id: '',
                 name: '',
@@ -339,9 +346,25 @@ export default {
             this.orderData = this.manageData.data
         },
         exportExcel() {
-            this.$refs.tables.exportCsv({
-                filename: `table-${new Date().valueOf()}.csv`
-            })
+            if (this.tableData.length) {
+                this.exportLoading = true
+                let dataCopy = this.tableData.slice(0)
+                // 遇到长数字 比如身份证时需要在数字前添加'\t' 否则cvs显示会异常
+                dataCopy.forEach(v => {
+                    v.id = '\t' + v.id
+                })
+                const params = {
+                    title: ['订单号', '客户名称', '订单日期', '交货日期'],
+                    key: ['id', 'name', 'startDate', 'endDate'],
+                    data: dataCopy,
+                    autoWidth: true,
+                    filename: '订单表'
+                }
+                excel.export_array_to_excel(params)
+                this.exportLoading = false
+            } else {
+                this.$Message.info('表格数据不能为空！')
+            }
         },
         // 选项改变时触发
         selectionChange(selection) {
