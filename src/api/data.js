@@ -1,6 +1,6 @@
 import axios from '@/libs/api.request'
 // 获取员工信息
-export const getTableData = () => {
+export const getEmployeeData = () => {
   return axios.request({
     url: 'get_table_data',
     method: 'get'

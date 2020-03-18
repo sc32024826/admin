@@ -66,7 +66,7 @@ export default [
           icon: 'md-people',
           title: '人员管理'
         },
-        component: () => import('@/view/components/tables/tables.vue')
+        component: () => import('@/view/employee/index.vue')
       },
       {
         path: 'organization',

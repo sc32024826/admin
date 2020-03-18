@@ -12,7 +12,6 @@
         @on-selection-change="selectionChange"
         @on-new-info="openDrawer_newItem"
         @on-muti-delete="deleteObject"
-        @on-save-edit="paramsEdit"
         @on-row-dblclick="onRowClick"
       />
       <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
@@ -206,8 +205,8 @@ export default {
                 { title: '订单日期', key: 'startDate' },
                 { title: '交货日期', key: 'endDate' },
                 {
-                    title: '订单详情',
-                    key: 'detail',
+                    title: '操作',
+                    key: 'action',
                     render: (h, params) => {
                         return [
                             h('div', [
@@ -384,16 +383,6 @@ export default {
 
             // 清空wannaDelete.data
             that.wannaDelete.data = []
-        },
-        // 修改操作
-        paramsEdit(params) {
-            console.log(params)
-            // 关键字段
-            // params.row.id
-            // 修改成
-            // params.value
-
-            // 调用axios 更新数据源
         },
         // 打开抽屉修改 内容
         onRowClick(row) {

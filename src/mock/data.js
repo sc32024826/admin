@@ -5,13 +5,13 @@ import { treeData } from './data/tree-select'
 const Random = Mock.Random
 
 // 伪造员工信息
-export const getTableData = req => {
+export const getEmployeeData = req => {
   let tableData = []
   doCustomTimes(5, () => {
     tableData.push(Mock.mock({
       id: '@integer(4)',
       name: '@name',
-      department: '@string'
+      department: Random.cword(2, 4) + '部'
     }))
   })
   return tableData
