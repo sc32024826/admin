@@ -11,7 +11,7 @@
         :columns="columns"
         @on-selection-change="selectionChange"
         @on-new-info="openDrawer_newItem"
-        @on-muti-delete="deleteMany"
+        @on-muti-delete="deleteObject"
         @on-save-edit="paramsEdit"
         @on-row-dblclick="onRowClick"
       />
@@ -163,6 +163,14 @@
         <Button type="primary" style="margin-right: 10px;" @click="addSize()">新增尺码</Button>
         <Button type="warning" @click="removeSize()">减少尺码</Button>
       </Modal>
+      <Modal
+        v-model="bDelete"
+        title="您确认要删除以下内容吗?"
+        @on-ok="confirmToDelete()"
+        @on-cancel="bDelete = false"
+      >
+        <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+      </Modal>
     </Card>
   </div>
 </template>
@@ -202,39 +210,61 @@ export default {
                     key: 'detail',
                     render: (h, params) => {
                         return [
-                            h(
-                                'Button',
-                                {
-                                    props: { type: 'primary', size: 'small' },
-                                    style: { 'margin': '2px' },
-                                    on: {
-                                        click: () => {
-                                            this.showDetails(params.row.details)
+                            h('div', [
+                                h(
+                                    'Button',
+                                    {
+                                        props: {
+                                            type: 'primary',
+                                            size: 'small'
+                                        },
+                                        style: { margin: '2px' },
+                                        on: {
+                                            click: () => {
+                                                this.showDetails(
+                                                    params.row.details
+                                                )
+                                            }
                                         }
-                                    }
-                                },
-                                '查看详情'
-                            ),
-                            h(
-                                'Button',
-                                {
-                                    props: { type: 'warning', size: 'small' },
-                                    style: { 'margin': '2px' },
-                                    on: {
-                                        click: () => {
-                                            this.onRowClick(params.row)
+                                    },
+                                    '查看详情'
+                                ),
+                                h(
+                                    'Button',
+                                    {
+                                        props: {
+                                            type: 'warning',
+                                            size: 'small'
+                                        },
+                                        style: { margin: '2px' },
+                                        on: {
+                                            click: () => {
+                                                this.onRowClick(params.row)
+                                            }
                                         }
-                                    }
-                                },
-                                '修改内容'
-                            )
+                                    },
+                                    '修改内容'
+                                ),
+                                h(
+                                    'Button',
+                                    {
+                                        props: { type: 'error', size: 'small' },
+                                        style: { margin: '2px' },
+                                        on: {
+                                            click: () => {
+                                                this.deleteObject(params.row)
+                                            }
+                                        }
+                                    },
+                                    '删除'
+                                )
+                            ])
                         ]
                     }
                 }
             ],
             tableData: [],
             drawer_new_item: false,
-            drawer_deleteMany: false,
             drawer_editinfo: false,
             formData: {
                 id: '',
@@ -271,7 +301,16 @@ export default {
             current_color: '',
             current_size: [],
             // 打开对话框
-            bShowDetails: false
+            bShowDetails: false, // 显示订单详情的对话框
+            bDelete: false, // 确认删除对话框
+            // 将要删除的内容
+            wannaDelete: {
+                columns: [
+                    { title: '订单号', key: 'id', width: 150, align: 'center' },
+                    { title: '客户名称', key: 'name' }
+                ],
+                data: []
+            }
         }
     },
     methods: {
@@ -315,14 +354,36 @@ export default {
             console.log('显示新的抽屉')
         },
 
-        // 打开批量删除的抽屉
-        deleteMany() {
-            this.drawer_deleteMany = true
+        // 打开删除的对话框,data为要删除的对象
+        deleteObject(data) {
+            this.bDelete = true
+            let needToDel = this.wannaDelete.data
+            if (data) {
+                console.log(data)
+                needToDel.push({ id: data.id, name: data.name })
+            } else {
+                console.log(this.selection)
+                let list = this.selection
+                list.forEach(v => {
+                    needToDel.push({ id: v.id, name: v.name })
+                })
+            }
         },
-        // 删除勾选项
-        deleteConfirm() {
+        // 删除已选项
+        confirmToDelete() {
+            let that = this
             // 勾选项 为 selection
             // 调用axios 删除 selection 匹配的数据
+            // 数组
+            let needToDel = that.wannaDelete.data
+            // 删除完毕后之后更新数据源
+            console.log(that.tableData)
+            needToDel.forEach(v => {
+                that.tableData = that.tableData.filter(item => item.id !== v.id)
+            })
+
+            // 清空wannaDelete.data
+            that.wannaDelete.data = []
         },
         // 修改操作
         paramsEdit(params) {
@@ -463,6 +524,14 @@ export default {
         getOrderData().then(res => {
             this.tableData = res.data
         })
+    },
+    watch: {
+        bDelete: function() {
+            if (!this.bDelete) {
+                console.log('变量发生改变 false')
+                this.wannaDelete.data = []
+            }
+        }
     }
 }
 </script>
