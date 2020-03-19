@@ -90,10 +90,9 @@ export default {
                                     'Button',
                                     {
                                         props: {
-                                            type: 'warning',
-                                            size: 'small'
+                                            type: 'warning'
                                         },
-                                        style: { 'margin-right': '2px' },
+                                        style: { 'margin-right': '4px' },
                                         on: {
                                             click: () => {
                                                 this.editEmployeeInfo(
@@ -107,7 +106,7 @@ export default {
                                 h(
                                     'Button',
                                     {
-                                        props: { type: 'error', size: 'small' },
+                                        props: { type: 'error' },
                                         on: {
                                             click: () => {
                                                 this.deleteObject(params.row)

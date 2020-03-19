@@ -162,15 +162,9 @@
           </Col>
         </Row>
         <Row :gutter="10">
-          <Col span="8" v-for="(item, index) in current_size" :key="index">
+          <Col span="8" v-for="(item, index) in sizeMap" :key="index">
             <FormItem label="尺码" label-position="top" prop="size">
-              <Select
-                v-model="item.s"
-                filterable
-                allow-create
-                @on-create="handleCreate_size"
-                @blur="handleCreate_size"
-              >
+              <Select v-model="item.s" filterable>
                 <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
               </Select>
             </FormItem>
@@ -180,8 +174,6 @@
           </Col>
         </Row>
       </Form>
-      <Button type="primary" style="margin-right: 10px;" @click="addSize()">新增尺码</Button>
-      <Button type="warning" @click="removeSize()">减少尺码</Button>
     </Modal>
     <Modal
       v-model="bDelete"
@@ -260,10 +252,9 @@ export default {
                                     'Button',
                                     {
                                         props: {
-                                            type: 'primary',
-                                            size: 'small'
+                                            type: 'primary'
                                         },
-                                        style: { margin: '2px' },
+                                        style: { 'margin-right': '4px' },
                                         on: {
                                             click: () => {
                                                 this.showDetails(params.row)
@@ -276,10 +267,9 @@ export default {
                                     'Button',
                                     {
                                         props: {
-                                            type: 'warning',
-                                            size: 'small'
+                                            type: 'warning'
                                         },
-                                        style: { margin: '2px' },
+                                        style: { 'margin-right': '4px' },
                                         on: {
                                             click: () => {
                                                 this.onRowEdit(params.row)
@@ -291,8 +281,7 @@ export default {
                                 h(
                                     'Button',
                                     {
-                                        props: { type: 'error', size: 'small' },
-                                        style: { margin: '2px' },
+                                        props: { type: 'error' },
                                         on: {
                                             click: () => {
                                                 this.deleteObject(params.row)
@@ -330,8 +319,6 @@ export default {
                 { title: '款式', key: 'style', align: 'center' },
                 { title: '颜色', key: 'color', align: 'center' }
             ],
-            // 尺码表
-            sizeList: [{ id: '', value: '' }],
             // 控制model的开关显示
             bShowModel_details: false,
             bShowModel_add: false,
@@ -367,7 +354,7 @@ export default {
             },
             current_style: '',
             current_color: '',
-            current_size: [],
+            sizeMap: [],
             // 打开对话框
             bShowDetails: false, // 显示订单详情的对话框
             bDelete: false, // 确认删除对话框
@@ -612,10 +599,6 @@ export default {
             console.log('增加颜色' + val)
             this.newItem.color.push({ value: val, label: val })
         },
-        handleCreate_size(val) {
-            console.log('增加尺码' + val)
-            this.newItem.size.push({ value: val, label: val })
-        },
         addnewitemok(name) {
             // this.$refs[name].validate(valid => {
             //     if (valid) {
@@ -629,7 +612,7 @@ export default {
                 style: this.current_style,
                 color: this.current_color
             }
-            this.current_size.forEach((v, k) => {
+            this.sizeMap.forEach((v, k) => {
                 // v.s 标识尺码号  v.v 表示该尺码数量
                 item[v.s] = v.v
             })
@@ -640,14 +623,6 @@ export default {
             // if(this.current_style)
             // console.log(this.newItem.style)
             */
-        },
-        // 新增一个尺码
-        addSize() {
-            // console.log(this.current_size)
-            this.current_size.push({ s: '输入尺码', v: '' })
-        },
-        removeSize() {
-            this.current_size.pop()
         }
     },
     mounted() {
