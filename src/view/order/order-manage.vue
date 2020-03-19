@@ -48,7 +48,7 @@
           <Row :gutter="32">
             <Col span="24">
               <FormItem label="订单详情" label-position="top">
-                <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+                <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
               </FormItem>
             </Col>
           </Row>
@@ -75,7 +75,7 @@
             <h4>交货日期:{{currentOrder.endDate}}</h4>
           </Col>
         </Row>
-        <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+        <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
         <div class="demo-drawer-footer">
           <Button
             icon="md-download"
@@ -116,7 +116,7 @@
           <Row :gutter="32">
             <Col span="24">
               <FormItem label="订单详情" label-position="top">
-                <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+                <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
               </FormItem>
             </Col>
           </Row>
@@ -324,7 +324,12 @@ export default {
             },
             selection: [],
             allDepartment: [],
-            order: {},
+            order: {
+                name: '',
+                startDate: '',
+                endDate: '',
+                data: []
+            },
             // 处理之后的数据
             manageData: {
                 data: [],
@@ -335,8 +340,6 @@ export default {
                 { title: '款式', key: 'style', align: 'center' },
                 { title: '颜色', key: 'color', align: 'center' }
             ],
-            // 订单详情 details
-            orderData: [],
             // 尺码表
             sizeList: [{ id: '', value: '' }],
             // 控制model的开关显示
@@ -421,7 +424,7 @@ export default {
             this.orderColumns = getColumns(newColumns)
             console.log(this.orderColumns)
             // 数据填充
-            this.orderData = this.manageData.data
+            this.order.data = this.manageData.data
         },
         exportExcel() {
             if (this.tableData.length) {
@@ -506,9 +509,11 @@ export default {
         // 打开对话框修改 内容
         onRowClick(row) {
             var that = this
-            console.log(that.tableData)
             that.bShowModel_details = true
-            that.order = row
+            that.order.id = row.id
+            that.order.name = row.name
+            that.order.startDate = row.startDate
+            that.order.endDate = row.endDate
             // 将数据源 填充
             that.manageData = manage(row.details)
             // 更新交叉表 列名
@@ -521,22 +526,6 @@ export default {
                 align: 'center',
                 render: (h, params) => {
                     return [
-                        h(
-                            'Button',
-                            {
-                                props: {
-                                    type: 'warning',
-                                    size: 'small'
-                                },
-                                style: { margin: '2px' },
-                                on: {
-                                    click: () => {
-                                        that.handleEdit(params)
-                                    }
-                                }
-                            },
-                            '修改'
-                        ),
                         h(
                             'Button',
                             {
@@ -557,8 +546,8 @@ export default {
                 }
             })
             // console.log(columnsNames)
-            that.orderData = that.manageData.data
-            console.log(that.tableData)
+            that.order.data = that.manageData.data
+            console.log(typeof that.tableData.startDate)
         },
         // 订单修改提交
         confirmEdit(data) {},
@@ -591,8 +580,8 @@ export default {
         },
         // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
         remove(index) {
-            this.orderData.splice(index, 1)
-            this.manageData = manage(this.orderData)
+            this.order.data.splice(index, 1)
+            this.manageData = manage(this.orde.data)
         },
         // 添加订单条目
         additem() {
@@ -602,8 +591,8 @@ export default {
             let styleli = []
             let colorli = []
             let size = [{ value: 'S' }, { value: 'M' }, { value: 'L' }]
-            // console.log(this.orderData)
-            this.orderData.forEach(i => {
+            // console.log(this.order.data)
+            this.order.data.forEach(i => {
                 !styleli.includes(i.style) ? styleli.push(i.style) : styleli
                 !colorli.includes(i.color) ? colorli.push(i.color) : colorli
             })
@@ -657,7 +646,7 @@ export default {
             })
             console.log(item)
             // 需要将这个新的数据 添加进 数据源中
-            this.orderData.push(item)
+            this.order.data.push(item)
             // 如果添加的款式 已经存在,则需要重新计算合并规则
             // if(this.current_style)
             // console.log(this.newItem.style)
