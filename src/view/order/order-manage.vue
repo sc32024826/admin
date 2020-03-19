@@ -12,7 +12,6 @@
         @on-selection-change="selectionChange"
         @on-new-info="openDrawer_newItem"
         @on-muti-delete="deleteObject"
-        @on-row-dblclick="onRowClick"
       />
       <Button
         style="margin: 10px 0;"
@@ -289,7 +288,7 @@ export default {
                                         style: { margin: '2px' },
                                         on: {
                                             click: () => {
-                                                this.onRowClick(params.row)
+                                                this.onRowEdit(params.row)
                                             }
                                         }
                                     },
@@ -331,10 +330,7 @@ export default {
                 data: []
             },
             // 处理之后的数据
-            manageData: {
-                data: [],
-                sizeMap: []
-            },
+            manageData: [],
             // 交叉表数据
             orderColumns: [
                 { title: '款式', key: 'style', align: 'center' },
@@ -411,20 +407,15 @@ export default {
         showDetails(data) {
             let deatil = data.details
             this.currentOrder = data
-            console.log('点击了查看详情按钮')
             // 显示对话框
             this.bShowDetails = true
             // 需要加工数据源 获得 合并跨度
             this.manageData = manage(deatil)
-            console.log(this.manageData)
-            // 更新交叉表 列名
-            let newColumns = this.manageData.sizeMap // 新的尺码表
-            console.log(newColumns)
-            // 重新生成尺码表
-            this.orderColumns = getColumns(newColumns)
+            // 生成尺码表
+            this.orderColumns = getColumns()
             console.log(this.orderColumns)
             // 数据填充
-            this.order.data = this.manageData.data
+            this.order.data = this.manageData
         },
         exportExcel() {
             if (this.tableData.length) {
@@ -507,7 +498,7 @@ export default {
             that.wannaDelete.data = []
         },
         // 打开对话框修改 内容
-        onRowClick(row) {
+        onRowEdit(row) {
             var that = this
             that.bShowModel_details = true
             that.order.id = row.id
@@ -516,10 +507,9 @@ export default {
             that.order.endDate = row.endDate
             // 将数据源 填充
             that.manageData = manage(row.details)
-            // 更新交叉表 列名
-            let newColumns = that.manageData.sizeMap // 新的尺码表
             // 重新生成尺码表
-            that.orderColumns = getColumns(newColumns)
+            that.orderColumns = getColumns()
+            console.log(that.orderColumns)
             // 添加 操作按钮
             that.orderColumns.push({
                 title: '操作',
@@ -545,7 +535,7 @@ export default {
                     ]
                 }
             })
-            that.order.data = that.manageData.data
+            that.order.data = that.manageData
         },
         // 订单修改提交
         confirmEdit(data) {},
@@ -590,8 +580,9 @@ export default {
             let styleli = []
             let colorli = []
             let size = [{ value: 'S' }, { value: 'M' }, { value: 'L' }]
-            // console.log(this.order.data)
-            this.order.data.forEach(i => {
+            let data = this.order.data
+            // console.log(data)
+            data.forEach(i => {
                 !styleli.includes(i.style) ? styleli.push(i.style) : styleli
                 !colorli.includes(i.color) ? colorli.push(i.color) : colorli
             })
