@@ -59,7 +59,31 @@
         </div>
       </Modal>
       <Modal title="订单详情" v-model="bShowDetails">
+        <Row>
+          <Col span="12" offset="6" align="center">
+            <h2>{{currentOrder.name}}</h2>
+          </Col>
+        </Row>
+        <Row type="flex" justify="space-between">
+          <Col span="6">
+            <h4>订单号:{{currentOrder.id}}</h4>
+          </Col>
+          <Col span="8" align="right">
+            <h4>订单日期:{{currentOrder.startDate}}</h4>
+          </Col>
+          <Col span="8" align="right">
+            <h4>交货日期:{{currentOrder.endDate}}</h4>
+          </Col>
+        </Row>
         <Table :columns="orderColumns" :data="orderData" border :span-method="handleSpan"></Table>
+        <div class="demo-drawer-footer">
+          <Button
+            icon="md-download"
+            :loading="exportLoading"
+            @click="exportExcel_detail"
+            disabled
+          >导出为Csv文件</Button>
+        </div>
       </Modal>
       <Modal
         v-model="bShowModel_details"
@@ -97,21 +121,20 @@
             </Col>
           </Row>
         </Form>
-        <Button style="margin-right: 10px;" type="primary" @click="exportExcel">导出为Csv文件</Button>
-        <Button style="margin-right: 10px;" type="warning" @click="handleEdit()">编辑数量</Button>
         <Button type="primary" @click="additem">添加条目</Button>
       </Modal>
       <Modal
+        ref="addNewLine"
         v-model="bShowModel_add"
         title="新增条目"
         :mask-closable="false"
-        @on-ok="addnewitemok"
+        @on-ok="addnewitemok('newItem')"
         @on-cancel="bShowModel_add = false"
       >
-        <Form :model="newItem">
+        <Form :model="newItem" :rules="rulesNewItem">
           <Row :gutter="32">
             <Col span="12">
-              <FormItem label="款式" label-position="top">
+              <FormItem label="款式" label-position="top" prop="style">
                 <Select
                   v-model="current_style"
                   filterable
@@ -128,7 +151,7 @@
               </FormItem>
             </Col>
             <Col span="12">
-              <FormItem label="颜色" label-position="top">
+              <FormItem label="颜色" label-position="top" prop="color">
                 <Select
                   v-model="current_color"
                   filterable
@@ -147,7 +170,7 @@
           </Row>
           <Row :gutter="10">
             <Col span="8" v-for="(item, index) in current_size" :key="index">
-              <FormItem label="尺码" label-position="top">
+              <FormItem label="尺码" label-position="top" prop="size">
                 <Select
                   v-model="item.s"
                   filterable
@@ -158,7 +181,7 @@
                   <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
                 </Select>
               </FormItem>
-              <FormItem label="数量" label-position="top">
+              <FormItem label="数量" label-position="top" prop="count">
                 <Input v-model="item.v" placeholder="输入件数" />
               </FormItem>
             </Col>
@@ -176,6 +199,29 @@
         <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
       </Modal>
     </Card>
+    <Modal title="修改内容" v-model="isShowdetailsEdit">
+      <Form :model="detailsItem">
+        <Row :gutter="32">
+          <Col span="12">
+            <FormItem label="款式" label-position="top">
+              <Input v-model="detailsItem.style" disabled />
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="颜色" label-position="top">
+              <Input v-model="detailsItem.color" disabled />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32" v-for="(item,index) in detailsItem.size" :key="index">
+          <Col span="12">
+            <FormItem :label="item.size" label-position="top">
+              <Input v-model="item.count" />
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
   </div>
 </template>
 
@@ -183,8 +229,9 @@
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
 import manage from './dataSourceAction'
-import reGenrateColumns from './columns'
+import getColumns from './getSizeColumns'
 import excel from '@/libs/excel'
+// import validate from 'async-validator'
 
 export default {
     name: 'tables_page',
@@ -226,9 +273,7 @@ export default {
                                         style: { margin: '2px' },
                                         on: {
                                             click: () => {
-                                                this.showDetails(
-                                                    params.row.details
-                                                )
+                                                this.showDetails(params.row)
                                             }
                                         }
                                     },
@@ -303,6 +348,30 @@ export default {
                 color: '',
                 size: ''
             },
+            rulesNewItem: {
+                style: {
+                    required: true,
+                    message: '请输入款式',
+                    trigger: 'blur'
+                },
+                color: {
+                    required: true,
+                    message: '请输入颜色',
+                    trigger: 'blur'
+                },
+                count: {
+                    required: true,
+                    message: '请输入款式',
+                    trigger: 'blur',
+                    type: Number
+                },
+                size: {
+                    required: true,
+                    message: '请输入尺码',
+                    trigger: 'blur',
+                    type: String
+                }
+            },
             current_style: '',
             current_color: '',
             current_size: [],
@@ -316,7 +385,13 @@ export default {
                     { title: '客户名称', key: 'name' }
                 ],
                 data: []
-            }
+            },
+            // 当前点击行的订单object
+            currentOrder: {},
+            // 显示修改订单内容的对话框
+            isShowdetailsEdit: false,
+            // 订单内容的单行数据
+            detailsItem: {}
         }
     },
     methods: {
@@ -331,16 +406,19 @@ export default {
         },
         // 显示详情页
         showDetails(data) {
+            let deatil = data.details
+            this.currentOrder = data
+            console.log('点击了查看详情按钮')
             // 显示对话框
             this.bShowDetails = true
             // 需要加工数据源 获得 合并跨度
-            this.manageData = manage(data)
+            this.manageData = manage(deatil)
             console.log(this.manageData)
             // 更新交叉表 列名
             let newColumns = this.manageData.sizeMap // 新的尺码表
             console.log(newColumns)
             // 重新生成尺码表
-            this.orderColumns = reGenrateColumns(newColumns)
+            this.orderColumns = getColumns(newColumns)
             console.log(this.orderColumns)
             // 数据填充
             this.orderData = this.manageData.data
@@ -349,11 +427,12 @@ export default {
             if (this.tableData.length) {
                 this.exportLoading = true
                 let dataCopy = this.tableData.slice(0)
-                // 遇到长数字 比如身份证时需要在数字前添加'\t' 否则cvs显示会异常
+                // 遇到长数字比如身份证时需要在数字前添加'\t',否则cvs显示会异常
                 dataCopy.forEach(v => {
                     v.id = '\t' + v.id
                 })
-                const params = {
+                console.log(dataCopy)
+                let params = {
                     title: ['订单号', '客户名称', '订单日期', '交货日期'],
                     key: ['id', 'name', 'startDate', 'endDate'],
                     data: dataCopy,
@@ -365,6 +444,23 @@ export default {
             } else {
                 this.$Message.info('表格数据不能为空！')
             }
+        },
+        // 订单详情的导出
+        exportExcel_detail() {
+            // console.log(this.currentOrder)
+            // if (this.currentOrder.length) {
+            //     let params = {
+            //         title: ['订单号', '客户名称', '订单日期', '交货日期'],
+            //         key: ['id', 'name', 'startDate', 'endDate'],
+            //         data: dataCopy,
+            //         autoWidth: true,
+            //         filename: '订单表'
+            //     }
+            //     excel.export_array_to_excel(params)
+            //     this.exportLoading = false
+            // } else {
+            //     this.$Message.info('表格数据不能为空！')
+            // }
         },
         // 选项改变时触发
         selectionChange(selection) {
@@ -407,9 +503,10 @@ export default {
             // 清空wannaDelete.data
             that.wannaDelete.data = []
         },
-        // 打开抽屉修改 内容
+        // 打开对话框修改 内容
         onRowClick(row) {
             var that = this
+            console.log(that.tableData)
             that.bShowModel_details = true
             that.order = row
             // 将数据源 填充
@@ -417,47 +514,81 @@ export default {
             // 更新交叉表 列名
             let newColumns = that.manageData.sizeMap // 新的尺码表
             // 重新生成尺码表
-            that.orderColumns = reGenrateColumns(newColumns)
+            that.orderColumns = getColumns(newColumns)
             // 添加 操作按钮
             that.orderColumns.push({
                 title: '操作',
                 align: 'center',
-                render(h, params) {
-                    return h(
-                        'Button',
-                        {
-                            props: {
-                                type: 'error',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    that.remove(params.index)
+                render: (h, params) => {
+                    return [
+                        h(
+                            'Button',
+                            {
+                                props: {
+                                    type: 'warning',
+                                    size: 'small'
+                                },
+                                style: { margin: '2px' },
+                                on: {
+                                    click: () => {
+                                        that.handleEdit(params)
+                                    }
                                 }
-                            }
-                        },
-                        '删除'
-                    )
+                            },
+                            '修改'
+                        ),
+                        h(
+                            'Button',
+                            {
+                                props: {
+                                    type: 'error',
+                                    size: 'small'
+                                },
+                                style: { margin: '2px' },
+                                on: {
+                                    click: () => {
+                                        that.remove(params.index)
+                                    }
+                                }
+                            },
+                            '删除'
+                        )
+                    ]
                 }
             })
             // console.log(columnsNames)
-            this.orderData = this.manageData.data
-            // console.log(this.orderData)
+            that.orderData = that.manageData.data
+            console.log(that.tableData)
         },
         // 订单修改提交
         confirmEdit(data) {},
-        // 将数据源修改成需要的格式
-        TurnType(array) {
-            // console.log(array)
-            return array
-        },
+
         edit_count() {},
         // 确认修改操作
         ok() {
             console.log(this.order)
             // 调用axios
         },
-        handleEdit() {},
+        // 修改订单信息
+        handleEdit(params) {
+            console.log(params)
+            let item = this.detailsItem
+            item.style = params.row.style
+            item.color = params.row.color
+            item.size = []
+
+            this.isShowdetailsEdit = true
+
+            let size = Object.keys(params.row)
+            let removeString = ['style', 'color', 'step', '_index', '_rowKey']
+            // 去除非尺码字段
+            size = size.filter(v => !removeString.includes(v))
+            size.forEach(e => {
+                let c = params.row[e]
+                item.size.push({ size: e, count: c })
+            })
+            console.log(item)
+        },
         // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
         remove(index) {
             this.orderData.splice(index, 1)
@@ -507,7 +638,15 @@ export default {
             console.log('增加尺码' + val)
             this.newItem.size.push({ value: val, label: val })
         },
-        addnewitemok() {
+        addnewitemok(name) {
+            // this.$refs[name].validate(valid => {
+            //     if (valid) {
+            //         this.$Message.success('Success!')
+            //     } else {
+            //         this.$Message.error('Fail!')
+            //     }
+            // })
+            /*
             let item = {
                 style: this.current_style,
                 color: this.current_color
@@ -522,6 +661,7 @@ export default {
             // 如果添加的款式 已经存在,则需要重新计算合并规则
             // if(this.current_style)
             // console.log(this.newItem.style)
+            */
         },
         // 新增一个尺码
         addSize() {
@@ -543,6 +683,10 @@ export default {
                 console.log('变量发生改变 false')
                 this.wannaDelete.data = []
             }
+        },
+        tableData: function() {
+            console.log('tableData变量发生改变')
+            console.log(this.tableData)
         }
     }
 }

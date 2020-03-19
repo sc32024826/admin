@@ -10,15 +10,28 @@ function genColumns(sizeList) {
         { title: '款式', key: 'style', align: 'center' },
         { title: '颜色', key: 'color', align: 'center' }
     ]
-    let children = []
+    let children = [{
+        title: 'S',
+        key: 'S',
+        align: 'center'
+    },
+    {
+        title: 'M',
+        key: 'M',
+        align: 'center'
+    }, {
+        title: 'L',
+        key: 'L',
+        align: 'center'
+    }]
     // 添加尺码信息
-    sizeList.forEach(v => {
-        children.push({
-            title: v,
-            key: v,
-            align: 'center'
-        })
-    })
+    // sizeList.forEach(v => {
+    //     children.push({
+    //         title: v,
+    //         key: v,
+    //         align: 'center'
+    //     })
+    // })
     defaultColumns.push({
         title: '尺码',
         align: 'center',
