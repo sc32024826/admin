@@ -66,7 +66,7 @@ export default [
           icon: 'md-people',
           title: '人员管理'
         },
-        component: () => import('@/view/employee/index.vue')
+        component: () => import('@/view/baseSetting/employee/index.vue')
       },
       {
         path: 'organization',
@@ -75,7 +75,7 @@ export default [
           icon: 'md-podium',
           title: '组织架构管理'
         },
-        component: () => import('@/view/components/org-tree')
+        component: () => import('@/view/baseSetting/org/index.vue')
       },
       {
         path: 'guest_manage',
@@ -84,7 +84,7 @@ export default [
           icon: 'md-contacts',
           title: '客户管理'
         },
-        component: () => import('@/view/guest/guest.vue')
+        component: () => import('@/view/baseSetting/guest/index.vue')
       },
       {
         path: 'device_manage',
@@ -93,7 +93,7 @@ export default [
           icon: 'ios-desktop',
           title: '设备管理'
         },
-        component: () => import('@/view/components/drag-drawer')
+        component: () => import('@/view/baseSetting/devices/index.vue')
       }
     ]
   },
@@ -113,7 +113,7 @@ export default [
           icon: 'ios-document',
           title: '订单管理'
         },
-        component: () => import('@/view/order/order-manage.vue')
+        component: () => import('@/view/produceManage/order/index.vue')
       },
       {
         path: 'mission',
