@@ -1,203 +1,197 @@
 <template>
   <div>
-    <Card>
-      <tables
-        ref="tables"
-        stripe
-        editable
-        searchable
-        search-place="top"
-        v-model="tableData"
-        :columns="columns"
-        @on-selection-change="selectionChange"
-        @on-new-info="openDrawer_newItem"
-        @on-muti-delete="deleteObject"
-      />
-      <Button
-        style="margin: 10px 0;"
-        icon="md-download"
-        :loading="exportLoading"
-        @click="exportExcel"
-      >导出为Csv文件</Button>
-    </Card>
-    <Card>
-      <Modal title="添加订单" v-model="drawer_new_item" width="90%">
-        <Form :model="formData">
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="客户名称" label-position="top">
-                <Input v-model="formData.name" placeholder="请输入客户名称"></Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="订单日期" label-position="top">
-                <DatePicker placeholder="Select date" type="date"></DatePicker>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="交货日期" label-position="top">
-                <DatePicker placeholder="Select date" type="date"></DatePicker>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="订单详情" label-position="top">
-                <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
-        <div class="demo-drawer-footer">
-          <Button style="margin: 8px" @click="drawer_new_item= false">取消</Button>
-          <Button type="primary" @click="submit(formData)">提交</Button>
-        </div>
-      </Modal>
-      <Modal title="订单详情" v-model="bShowDetails">
-        <Row>
-          <Col span="12" offset="6" align="center">
-            <h2>{{currentOrder.name}}</h2>
+    <tables
+      ref="tables"
+      stripe
+      editable
+      searchable
+      search-place="top"
+      v-model="tableData"
+      :columns="columns"
+      @on-selection-change="selectionChange"
+    />
+    <div class="bottom-button">
+      <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
+      <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
+      <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+    </div>
+    <Modal title="添加订单" v-model="drawer_new_item" width="90%">
+      <Form :model="formData">
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="客户名称" label-position="top">
+              <Input v-model="formData.name" placeholder="请输入客户名称"></Input>
+            </FormItem>
           </Col>
         </Row>
-        <Row type="flex" justify="space-between">
-          <Col span="6">
-            <h4>订单号:{{currentOrder.id}}</h4>
-          </Col>
-          <Col span="8" align="right">
-            <h4>订单日期:{{currentOrder.startDate}}</h4>
-          </Col>
-          <Col span="8" align="right">
-            <h4>交货日期:{{currentOrder.endDate}}</h4>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单日期" label-position="top">
+              <DatePicker placeholder="Select date" type="date"></DatePicker>
+            </FormItem>
           </Col>
         </Row>
-        <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-        <div class="demo-drawer-footer">
-          <Button
-            icon="md-download"
-            :loading="exportLoading"
-            @click="exportExcel_detail"
-            disabled
-          >导出为Csv文件</Button>
-        </div>
-      </Modal>
-      <Modal
-        v-model="bShowModel_details"
-        title="订单详情"
-        @on-ok="ok()"
-        @on-canccel="that.bShowModel_details = false"
-        width="90%"
-      >
-        <Form :model="order">
-          <Row :gutter="32">
-            <Col span="8">
-              <FormItem label="客户名称" label-position="top">
-                <Input v-model="order.name" />
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="32">
-            <Col span="12">
-              <FormItem label="订单日期" label-position="top">
-                <DatePicker v-model="order.startDate"></DatePicker>
-              </FormItem>
-            </Col>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="交货日期" label-position="top">
+              <DatePicker placeholder="Select date" type="date"></DatePicker>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单详情" label-position="top">
+              <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div class="demo-drawer-footer">
+        <Button style="margin: 8px" @click="drawer_new_item= false">取消</Button>
+        <Button type="primary" @click="submit(formData)">提交</Button>
+      </div>
+    </Modal>
+    <Modal title="订单详情" v-model="bShowDetails">
+      <Row>
+        <Col span="12" offset="6" align="center">
+          <h2>{{currentOrder.name}}</h2>
+        </Col>
+      </Row>
+      <Row type="flex" justify="space-between">
+        <Col span="6">
+          <h4>订单号:{{currentOrder.id}}</h4>
+        </Col>
+        <Col span="8" align="right">
+          <h4>订单日期:{{currentOrder.startDate}}</h4>
+        </Col>
+        <Col span="8" align="right">
+          <h4>交货日期:{{currentOrder.endDate}}</h4>
+        </Col>
+      </Row>
+      <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
+      <div class="demo-drawer-footer">
+        <Button
+          icon="md-download"
+          :loading="exportLoading"
+          @click="exportExcel_detail"
+          disabled
+        >导出为Csv文件</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="bShowModel_details"
+      title="订单详情"
+      @on-ok="ok()"
+      @on-canccel="that.bShowModel_details = false"
+      width="90%"
+    >
+      <Form :model="order">
+        <Row :gutter="32">
+          <Col span="8">
+            <FormItem label="客户名称" label-position="top">
+              <Input v-model="order.name" />
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="12">
+            <FormItem label="订单日期" label-position="top">
+              <DatePicker v-model="order.startDate"></DatePicker>
+            </FormItem>
+          </Col>
 
-            <Col span="12">
-              <FormItem label="交货日期" label-position="top">
-                <DatePicker v-model="order.endDate"></DatePicker>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="32">
-            <Col span="24">
-              <FormItem label="订单详情" label-position="top">
-                <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
-        <Button type="primary" @click="additem">添加条目</Button>
-      </Modal>
-      <Modal
-        ref="addNewLine"
-        v-model="bShowModel_add"
-        title="新增条目"
-        :mask-closable="false"
-        @on-ok="addnewitemok('newItem')"
-        @on-cancel="bShowModel_add = false"
-      >
-        <Form :model="newItem" :rules="rulesNewItem">
-          <Row :gutter="32">
-            <Col span="12">
-              <FormItem label="款式" label-position="top" prop="style">
-                <Select
-                  v-model="current_style"
-                  filterable
-                  allow-create
-                  @on-create="handleCreate_style"
-                  @blur="handleCreate_style"
-                >
-                  <Option
-                    v-for="(item,index) in newItem.style"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="12">
-              <FormItem label="颜色" label-position="top" prop="color">
-                <Select
-                  v-model="current_color"
-                  filterable
-                  allow-create
-                  @on-create="handleCreate_color"
-                  @blur="handleCreate_color"
-                >
-                  <Option
-                    v-for="(item,index) in newItem.color"
-                    :key="index"
-                    :value="item.value"
-                  >{{item.value}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="10">
-            <Col span="8" v-for="(item, index) in current_size" :key="index">
-              <FormItem label="尺码" label-position="top" prop="size">
-                <Select
-                  v-model="item.s"
-                  filterable
-                  allow-create
-                  @on-create="handleCreate_size"
-                  @blur="handleCreate_size"
-                >
-                  <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
-                </Select>
-              </FormItem>
-              <FormItem label="数量" label-position="top" prop="count">
-                <Input v-model="item.v" placeholder="输入件数" />
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
-        <Button type="primary" style="margin-right: 10px;" @click="addSize()">新增尺码</Button>
-        <Button type="warning" @click="removeSize()">减少尺码</Button>
-      </Modal>
-      <Modal
-        v-model="bDelete"
-        title="您确认要删除以下内容吗?"
-        @on-ok="confirmToDelete()"
-        @on-cancel="bDelete = false"
-      >
-        <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
-      </Modal>
-    </Card>
+          <Col span="12">
+            <FormItem label="交货日期" label-position="top">
+              <DatePicker v-model="order.endDate"></DatePicker>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
+            <FormItem label="订单详情" label-position="top">
+              <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <Button type="primary" @click="additem">添加条目</Button>
+    </Modal>
+    <Modal
+      ref="addNewLine"
+      v-model="bShowModel_add"
+      title="新增条目"
+      :mask-closable="false"
+      @on-ok="addnewitemok('newItem')"
+      @on-cancel="bShowModel_add = false"
+    >
+      <Form :model="newItem" :rules="rulesNewItem">
+        <Row :gutter="32">
+          <Col span="12">
+            <FormItem label="款式" label-position="top" prop="style">
+              <Select
+                v-model="current_style"
+                filterable
+                allow-create
+                @on-create="handleCreate_style"
+                @blur="handleCreate_style"
+              >
+                <Option
+                  v-for="(item,index) in newItem.style"
+                  :key="index"
+                  :value="item.value"
+                >{{item.value}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="颜色" label-position="top" prop="color">
+              <Select
+                v-model="current_color"
+                filterable
+                allow-create
+                @on-create="handleCreate_color"
+                @blur="handleCreate_color"
+              >
+                <Option
+                  v-for="(item,index) in newItem.color"
+                  :key="index"
+                  :value="item.value"
+                >{{item.value}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row :gutter="10">
+          <Col span="8" v-for="(item, index) in current_size" :key="index">
+            <FormItem label="尺码" label-position="top" prop="size">
+              <Select
+                v-model="item.s"
+                filterable
+                allow-create
+                @on-create="handleCreate_size"
+                @blur="handleCreate_size"
+              >
+                <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem label="数量" label-position="top" prop="count">
+              <Input v-model="item.v" placeholder="输入件数" />
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <Button type="primary" style="margin-right: 10px;" @click="addSize()">新增尺码</Button>
+      <Button type="warning" @click="removeSize()">减少尺码</Button>
+    </Modal>
+    <Modal
+      v-model="bDelete"
+      title="您确认要删除以下内容吗?"
+      @on-ok="confirmToDelete()"
+      @on-cancel="bDelete = false"
+    >
+      <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+    </Modal>
+
     <Modal title="修改内容" v-model="isShowdetailsEdit">
       <Form :model="detailsItem">
         <Row :gutter="32">
@@ -468,17 +462,22 @@ export default {
 
         // 打开删除的对话框,data为要删除的对象
         deleteObject(data) {
-            this.bDelete = true
             let needToDel = this.wannaDelete.data
             if (data) {
+                this.bDelete = true
                 console.log(data)
                 needToDel.push({ id: data.id, name: data.name })
             } else {
                 console.log(this.selection)
                 let list = this.selection
-                list.forEach(v => {
-                    needToDel.push({ id: v.id, name: v.name })
-                })
+                if (list.length) {
+                    this.bDelete = true
+                    list.forEach(v => {
+                        needToDel.push({ id: v.id, name: v.name })
+                    })
+                } else {
+                    this.$Message.warning('没有选择任何数据!')
+                }
             }
         },
         // 删除已选项
@@ -677,5 +676,12 @@ export default {
     padding: 10px 16px;
     text-align: right;
     background: #fff;
+}
+.bottom-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.mr {
+    margin-right: 10px;
 }
 </style>

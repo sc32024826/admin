@@ -21,6 +21,21 @@ export const getOrderData = () => {
   })
 }
 
+// 获取 组织架构
+export const getOrgData = () => {
+  return axios.request({
+    url: 'get_org_data',
+    method: 'get'
+  })
+}
+// 获取设备信息
+export const getDevicesData = () => {
+  return axios.request({
+    url: 'get_devices_data',
+    method: 'get'
+  })
+}
+
 export const errorReq = () => {
   return axios.request({
     url: 'error_url',
@@ -40,19 +55,5 @@ export const uploadImg = formData => {
   return axios.request({
     url: 'image/upload',
     data: formData
-  })
-}
-// 获取 组织架构
-export const getOrgData = () => {
-  return axios.request({
-    url: 'get_org_data',
-    method: 'get'
-  })
-}
-
-export const getTreeSelectData = () => {
-  return axios.request({
-    url: 'get_tree_select_data',
-    method: 'get'
   })
 }

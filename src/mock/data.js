@@ -1,7 +1,7 @@
 import Mock from 'mockjs'
 import { doCustomTimes } from '@/libs/util'
 import orgData from './data/org-data'
-import { treeData } from './data/tree-select'
+// import { treeData } from './data/tree-select'
 const Random = Mock.Random
 
 // 伪造员工信息
@@ -110,6 +110,13 @@ export const getOrgData = req => {
   return orgData
 }
 
-export const getTreeSelectData = req => {
-  return treeData
+export const getDevicesData = req => {
+  let tableData = []
+  doCustomTimes(5, () => {
+    tableData.push(Mock.mock({
+      id: Random.increment(10),
+      deviceName: '@name'
+    }))
+  })
+  return tableData
 }

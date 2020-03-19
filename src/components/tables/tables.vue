@@ -7,10 +7,6 @@
       <Input @on-change="handleClear" clearable placeholder="输入关键字搜索" class="search-input" v-model="searchValue"/>
       <Button @click="handleSearch" class="search-btn" type="primary"><Icon type="ios-search"/>&nbsp;&nbsp;搜索</Button>
     </div>
-    <div style="margin-bottom:10px">
-      <Button @click="new_info" type="primary">新增信息</Button>&nbsp;&nbsp;
-      <Button @click="muti_delete" type="primary">批量删除</Button>
-    </div>
     <Table
       ref="tablesMain"
       :data="insideTableData"
@@ -37,8 +33,6 @@
       @on-row-click="onRowClick"
       @on-row-dblclick="onRowDblclick"
       @on-expand="onExpand"
-      @on-muti-delete="onMutiDelete"
-      @on-new-info="onNewInfo"
     >
       <slot name="header" slot="header"></slot>
       <slot name="footer" slot="footer"></slot>
@@ -276,22 +270,6 @@ export default {
     },
     onExpand (row, status) {
       this.$emit('on-expand', row, status)
-    },
-    // 新增员工信息
-    new_info () {
-      this.$emit('on-new-info')
-    },
-    onNewInfo () {
-      console.log('1111')
-      this.$emit('on-new-info')
-    },
-    onMutiDelete () {
-      console.log('1111')
-      this.$emit('on-muti-delete')
-    },
-    muti_delete () {
-      console.log('在子组件触发方法,父组件监听相应的方法')
-      this.$emit('on-muti-delete')
     }
   },
   watch: {

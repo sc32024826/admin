@@ -1,22 +1,21 @@
 <template>
   <div>
-    <Card>
-      <tables
-        ref="tables"
-        stripe
-        editable
-        searchable
-        search-place="top"
-        v-model="tableData"
-        :columns="columns"
-        @on-delete="handleDelete"
-        @on-selection-change="selectionChange"
-        @on-new-info="addNewEmployee"
-        @on-muti-delete="deleteMany"
-        @on-save-edit="paramsEdit"
-      />
-      <Button style="margin: 10px 0;" type="primary" @click="exportExcel">导出为Csv文件</Button>
-    </Card>
+    <tables
+      ref="tables"
+      stripe
+      editable
+      searchable
+      search-place="top"
+      v-model="tableData"
+      :columns="columns"
+      @on-delete="handleDelete"
+      @on-selection-change="selectionChange"
+    />
+    <div class="bottom-button">
+      <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
+      <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
+      <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+    </div>
     <Drawer title="添加客户信息" v-model="drawer_new_em" width="720" :mask-closable="false">
       <Form :model="formData">
         <Row :gutter="32">
@@ -49,100 +48,202 @@
         <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
       </div>
     </Drawer>
-    <Drawer title="批量删除客户" :closable="false" v-model="drawer_deleteMany" width="400">
-      <h2 style="color:red">是否确认删除以下客户的相关信息:</h2>
-      <h3 v-for="item in selection" :key="item.id">{{item.name}}</h3>
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click=" drawer_deleteMany= false">取消</Button>
-        <Button type="primary" @click="deleteConfirm()">确定</Button>
-      </div>
-    </Drawer>
+    <Modal
+      v-model="bDelete"
+      title="您确认要删除以下内容吗?"
+      @on-ok="confirmToDelete"
+      @on-cancel="bDelete = false"
+    >
+      <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+    </Modal>
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import { getGuestData } from '@/api/data'
+import excel from '@/libs/excel'
+
 export default {
-  name: 'tables_page',
-  components: {
-    Tables
-  },
-  data () {
-    return {
-      columns: [
-        {
-          type: 'selection',
-          width: '60',
-          align: 'center',
-          key: 'sele'
+    name: 'tables_page',
+    components: {
+        Tables
+    },
+    data() {
+        return {
+            columns: [
+                {
+                    type: 'selection',
+                    width: '60',
+                    align: 'center',
+                    key: 'sele'
+                },
+                { title: '编号', key: 'id', sortable: true },
+                { title: '客户简称', key: 'nichen' },
+                { title: '客户全称', key: 'name' },
+                { title: '联系人姓名', key: 'contact' },
+                { title: '联系人电话', key: 'tel' },
+                {
+                    title: '操作',
+                    key: 'action',
+                    render: (h, params) => {
+                        return h(
+                            'Button',
+                            {
+                                props: {
+                                    type: 'error'
+                                },
+                                style: {},
+                                on: {
+                                    click: () => {
+                                        this.deleteObject(params.row)
+                                    }
+                                }
+                            },
+                            '删除'
+                        )
+                    }
+                }
+            ],
+            tableData: [],
+            drawer_new_em: false,
+            bDelete: false,
+            formData: {
+                id: '',
+                name: '',
+                department: ''
+            },
+            selection: [],
+            allDepartment: [],
+            // 将要删除的内容
+            wannaDelete: {
+                columns: [
+                    { title: '编号', key: 'id', align: 'center' },
+                    { title: '客户简称', key: 'nichen' },
+                    { title: '客户全称', key: 'name' }
+                ],
+                data: []
+            },
+            exportLoading: false
+        }
+    },
+    methods: {
+        handleDelete(params) {
+            console.log(params)
         },
-        { title: '编号', key: 'id', sortable: true },
-        { title: '客户简称', key: 'nichen', editable: true },
-        { title: '客户全称', key: 'name', editable: true },
-        { title: '联系人姓名', key: 'contact', editable: true },
-        { title: '联系人电话', key: 'tel', editable: true }
-      ],
-      tableData: [],
-      drawer_new_em: false,
-      drawer_deleteMany: false,
-      formData: {
-        id: '',
-        name: '',
-        department: ''
-      },
-      selection: [],
-      allDepartment: []
-    }
-  },
-  methods: {
-    handleDelete (params) {
-      console.log(params)
-    },
-    exportExcel () {
-      this.$refs.tables.exportCsv({
-        filename: `table-${new Date().valueOf()}.csv`
-      })
-    },
-    // 选项改变时触发
-    selectionChange (selection) {
-      this.selection = selection
-    },
-    // 打开抽屉-新建员工
-    addNewEmployee () {
-      this.drawer_new_em = true
-    },
-    employeeSubmit (formData) {
-      console.log('新增员工')
-      console.log(formData)
+        exportExcel() {
+            if (this.tableData.length) {
+                this.exportLoading = true
+                let dataCopy = this.tableData.slice(0)
+                // 遇到长数字比如身份证时需要在数字前添加'\t',否则cvs显示会异常
+                dataCopy.forEach(v => {
+                    v.id = '\t' + v.id
+                    v.tel = '\t' + v.tel
+                })
+                console.log(dataCopy)
+                let params = {
+                    title: [
+                        '编号',
+                        '客户简称',
+                        '客户全称',
+                        '联系人姓名',
+                        '联系人电话'
+                    ],
+                    key: ['id', 'nichen', 'name', 'contact', 'tel'],
+                    data: dataCopy,
+                    autoWidth: true,
+                    filename: `客户表-${new Date().valueOf()}.csv`
+                }
+                excel.export_array_to_excel(params)
+                this.exportLoading = false
+            } else {
+                this.$Message.info('表格数据不能为空！')
+            }
+        },
+        // 选项改变时触发
+        selectionChange(selection) {
+            this.selection = selection
+        },
+        // 打开抽屉-新建员工
+        addNewEmployee() {
+            this.drawer_new_em = true
+        },
+        employeeSubmit(formData) {
+            console.log('新增员工')
+            console.log(formData)
 
-      // axios
-    },
-    // 打开批量删除的抽屉
-    deleteMany () {
-      this.drawer_deleteMany = true
-    },
-    // 删除勾选项
-    deleteConfirm () {
-      // 勾选项 为 selection
-      // 调用axios 删除 selection 匹配的数据
-    },
-    // 修改操作
-    paramsEdit (params) {
-      console.log(params)
-      // 关键字段
-      // params.row.id
-      // 修改成
-      // params.value
+            // axios
+        },
+        // 打开批量删除的对话框
+        deleteObject(data) {
+            let needToDel = this.wannaDelete.data
+            console.log(data)
+            if (data) {
+                this.bDelete = true
+                console.log(data)
+                needToDel.push({
+                    id: data.id,
+                    nichen: data.nichen,
+                    name: data.name
+                })
+            } else {
+                console.log(this.selection)
 
-      // 调用axios 更新数据源
+                let list = this.selection
+                if (list.length) {
+                    this.bDelete = true
+
+                    list.forEach(v => {
+                        needToDel.push({
+                            id: v.id,
+                            nichen: v.nichen,
+                            name: v.name
+                        })
+                    })
+                } else {
+                    this.$Message.warning('没有选择任何数据!')
+                }
+            }
+        },
+        // 删除已选项
+        confirmToDelete() {
+            let that = this
+            // 勾选项 为 selection
+            // 调用axios 删除 selection 匹配的数据
+            // 数组
+            let needToDel = that.wannaDelete.data
+            // 删除完毕后之后更新数据源
+            console.log(that.tableData)
+            needToDel.forEach(v => {
+                that.tableData = that.tableData.filter(item => item.id !== v.id)
+            })
+
+            // 清空wannaDelete.data
+            that.wannaDelete.data = []
+        },
+        // 修改操作
+        paramsEdit(params) {
+            console.log(params)
+            // 关键字段
+            // params.row.id
+            // 修改成
+            // params.value
+
+            // 调用axios 更新数据源
+        }
+    },
+    mounted() {
+        getGuestData().then(res => {
+            this.tableData = res.data
+        })
+    },
+    watch: {
+        bDelete: function() {
+            if (!this.bDelete) {
+                this.wannaDelete.data = []
+            }
+        }
     }
-  },
-  mounted () {
-    getGuestData().then(res => {
-      this.tableData = res.data
-    })
-  }
 }
 </script>
 
@@ -156,5 +257,12 @@ export default {
     padding: 10px 16px;
     text-align: right;
     background: #fff;
+}
+.bottom-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.mr {
+    margin-right: 10px;
 }
 </style>

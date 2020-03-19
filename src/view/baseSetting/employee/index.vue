@@ -9,19 +9,23 @@
       v-model="tableData"
       :columns="columns"
       @on-selection-change="selectionChange"
-      @on-new-info="addNewEmployee"
-      @on-muti-delete="deleteObject"
     />
-    <Button style="margin: 10px 0;" icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
-    <Drawer title="新增员工信息" v-model="drawer_new_em" width="720" :mask-closable="false">
+    <div class="bottom-button">
+      <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增员工信息</Button>
+      <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除员工信息</Button>
+      <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+    </div>
+    <Drawer title="新增员工信息" v-model="drawer_new_em" :mask-closable="false">
       <Form :model="formData">
         <Row :gutter="32">
-          <Col span="12">
+          <Col span="24">
             <FormItem label="工号" label-position="top">
               <Input v-model="formData.id" placeholder="请输入员工工号" />
             </FormItem>
           </Col>
-          <Col span="12">
+        </Row>
+        <Row :gutter="32">
+          <Col span="24">
             <FormItem label="姓名" label-position="top">
               <Input v-model="formData.name" placeholder="请输入员工姓名"></Input>
             </FormItem>
@@ -198,19 +202,26 @@ export default {
             this.current_department = ''
             formData = {}
         },
-        // 打开批量删除的抽屉
+        // 打开批量删除的对话框
         deleteObject(data) {
-            this.bDelete = true
             let needToDel = this.wannaDelete.data
             if (data) {
+                this.bDelete = true
                 console.log(data)
                 needToDel.push({ id: data.id, name: data.name })
             } else {
                 console.log(this.selection)
+
                 let list = this.selection
-                list.forEach(v => {
-                    needToDel.push({ id: v.id, name: v.name })
-                })
+                if (list.length) {
+                    this.bDelete = true
+
+                    list.forEach(v => {
+                        needToDel.push({ id: v.id, name: v.name })
+                    })
+                } else {
+                    this.$Message.warning('没有选择任何数据!')
+                }
             }
         },
         // 删除已选项
@@ -266,5 +277,12 @@ export default {
     padding: 10px 16px;
     text-align: right;
     background: #fff;
+}
+.bottom-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.mr {
+    margin-right: 10px;
 }
 </style>
