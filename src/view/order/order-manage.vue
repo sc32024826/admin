@@ -545,9 +545,7 @@ export default {
                     ]
                 }
             })
-            // console.log(columnsNames)
             that.order.data = that.manageData.data
-            console.log(typeof that.tableData.startDate)
         },
         // 订单修改提交
         confirmEdit(data) {},
@@ -580,8 +578,9 @@ export default {
         },
         // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
         remove(index) {
-            this.order.data.splice(index, 1)
-            this.manageData = manage(this.orde.data)
+            let data = this.order.data
+            data.splice(index, 1)
+            this.manageData = manage(data)
         },
         // 添加订单条目
         additem() {
@@ -672,10 +671,6 @@ export default {
                 console.log('变量发生改变 false')
                 this.wannaDelete.data = []
             }
-        },
-        tableData: function() {
-            console.log('tableData变量发生改变')
-            console.log(this.tableData)
         }
     }
 }
