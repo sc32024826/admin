@@ -69,8 +69,8 @@ export default [
         component: () => import('@/view/baseSetting/employee/index.vue')
       },
       {
-        path: 'organization',
-        name: 'organization',
+        path: 'org',
+        name: 'orgManage',
         meta: {
           icon: 'md-podium',
           title: '组织架构管理'
@@ -122,7 +122,7 @@ export default [
           icon: 'md-clipboard',
           title: '生产任务'
         },
-        component: () => import('@/view/update/update-paste.vue')
+        component: () => import('@/view/produceManage/task/index.vue')
       }
     ]
   },

@@ -47,7 +47,7 @@ export default {
   // 添加内容
   setting: '基础设置',
   employeeManage: '人员管理',
-  organization: '组织架构管理',
+  orgManage: '组织架构管理',
   guestManage: '客户管理',
   deviceManage: '设备管理',
   produceManage: '生产管理',

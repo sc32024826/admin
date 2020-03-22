@@ -214,7 +214,6 @@
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
 import manage from './dataSourceAction'
-import getColumns from './getSizeColumns'
 import excel from '@/libs/excel'
 // import validate from 'async-validator'
 
@@ -255,34 +254,36 @@ export default {
                                         props: {
                                             type: 'primary'
                                         },
-                                        style: { 'margin-right': '4px' },
+                                        style: { margin: '4px' },
                                         on: {
                                             click: () => {
                                                 this.showDetails(params.row)
                                             }
                                         }
                                     },
-                                    '查看详情'
+                                    '查看'
                                 ),
                                 h(
                                     'Button',
                                     {
                                         props: {
-                                            type: 'warning'
+                                            type: 'warning',
+                                            size: 'small'
                                         },
-                                        style: { 'margin-right': '4px' },
+                                        style: { margin: '4px' },
                                         on: {
                                             click: () => {
                                                 this.onRowEdit(params.row)
                                             }
                                         }
                                     },
-                                    '修改内容'
+                                    '修改'
                                 ),
                                 h(
                                     'Button',
                                     {
-                                        props: { type: 'error' },
+                                        props: { type: 'error', size: 'small' },
+                                        style: { margin: '4px' },
                                         on: {
                                             click: () => {
                                                 this.deleteObject(params.row)
@@ -296,23 +297,11 @@ export default {
                     }
                 }
             ],
-            tableData: [],
+            tableData: [], // 主页表格数据源
             drawer_new_item: false,
             drawer_editinfo: false,
-            exportLoading: false,
-            formData: {
-                id: '',
-                name: '',
-                department: ''
-            },
-            selection: [],
-            allDepartment: [],
-            order: {
-                name: '',
-                startDate: '',
-                endDate: '',
-                data: []
-            },
+            exportLoading: false, // 下载按钮 载入状态
+            selection: [], // 勾选项
             // 处理之后的数据
             manageData: [],
             // 交叉表数据
@@ -328,30 +317,6 @@ export default {
                 style: '',
                 color: '',
                 size: ''
-            },
-            rulesNewItem: {
-                style: {
-                    required: true,
-                    message: '请输入款式',
-                    trigger: 'blur'
-                },
-                color: {
-                    required: true,
-                    message: '请输入颜色',
-                    trigger: 'blur'
-                },
-                count: {
-                    required: true,
-                    message: '请输入款式',
-                    trigger: 'blur',
-                    type: Number
-                },
-                size: {
-                    required: true,
-                    message: '请输入尺码',
-                    trigger: 'blur',
-                    type: String
-                }
             },
             current_style: '',
             current_color: '',
@@ -498,31 +463,6 @@ export default {
             that.orderColumns = getColumns()
             console.log(that.orderColumns)
             // 添加 操作按钮
-            that.orderColumns.push({
-                title: '操作',
-                align: 'center',
-                render: (h, params) => {
-                    return [
-                        h(
-                            'Button',
-                            {
-                                props: {
-                                    type: 'error',
-                                    size: 'small'
-                                },
-                                style: { margin: '2px' },
-                                on: {
-                                    click: () => {
-                                        that.remove(params.index)
-                                    }
-                                }
-                            },
-                            '删除'
-                        )
-                    ]
-                }
-            })
-            that.order.data = that.manageData
         },
         // 订单修改提交
         confirmEdit(data) {},
@@ -558,72 +498,6 @@ export default {
             let data = this.order.data
             data.splice(index, 1)
             this.manageData = manage(data)
-        },
-        // 添加订单条目
-        additem() {
-            this.bShowModel_add = true
-            console.log('改变显示状态')
-            // 定义一个数组 用于存放下拉选择器可选项的数组
-            let styleli = []
-            let colorli = []
-            let size = [{ value: 'S' }, { value: 'M' }, { value: 'L' }]
-            let data = this.order.data
-            // console.log(data)
-            data.forEach(i => {
-                !styleli.includes(i.style) ? styleli.push(i.style) : styleli
-                !colorli.includes(i.color) ? colorli.push(i.color) : colorli
-            })
-            let style = []
-            styleli.forEach((v, k) => {
-                style.push({
-                    value: v
-                })
-            })
-            let color = []
-            colorli.forEach((v, k) => {
-                color.push({
-                    value: v
-                })
-            })
-            this.newItem = {
-                style: style,
-                color: color,
-                size: size
-            }
-        },
-        handleCreate_style(val) {
-            console.log('增加款式' + val)
-            // console.log(this.newItem.style)
-            this.newItem.style.push({ value: val, label: val })
-        },
-        handleCreate_color(val) {
-            console.log('增加颜色' + val)
-            this.newItem.color.push({ value: val, label: val })
-        },
-        addnewitemok(name) {
-            // this.$refs[name].validate(valid => {
-            //     if (valid) {
-            //         this.$Message.success('Success!')
-            //     } else {
-            //         this.$Message.error('Fail!')
-            //     }
-            // })
-            /*
-            let item = {
-                style: this.current_style,
-                color: this.current_color
-            }
-            this.sizeMap.forEach((v, k) => {
-                // v.s 标识尺码号  v.v 表示该尺码数量
-                item[v.s] = v.v
-            })
-            console.log(item)
-            // 需要将这个新的数据 添加进 数据源中
-            this.order.data.push(item)
-            // 如果添加的款式 已经存在,则需要重新计算合并规则
-            // if(this.current_style)
-            // console.log(this.newItem.style)
-            */
         }
     },
     mounted() {

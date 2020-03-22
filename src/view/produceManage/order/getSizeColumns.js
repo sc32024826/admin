@@ -1,6 +1,6 @@
-import { getSize } from '@/view/utils/index'
+import { getSize } from '@/api/utils'
 /**
- * 通过尺码表 来生成Col
+ * 通过尺码表 来生成订单的列字段名,包括款式颜色尺码,后期需要添加合适的操作按钮
  *
  * @returns
  */
