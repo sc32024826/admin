@@ -1,4 +1,6 @@
- <Modal title="添加订单" v-model="drawer_new_item" width="90%">
+ <template>
+   <div>
+     <Modal title="添加订单" v-model="drawer_new_item" width="90%">
       <Form :model="formData">
         <Row :gutter="32">
           <Col span="24">
@@ -34,3 +36,8 @@
         <Button type="primary" @click="submit(formData)">提交</Button>
       </div>
     </Modal>
+   </div>
+ </template>
+ <script>
+export default {}
+</script>

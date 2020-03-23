@@ -146,3 +146,156 @@
             </FormItem>
           </Col>
         </Row>
+
+           drawer_new_item: false,
+            drawer_editinfo: false,
+            selection: [], // 勾选项
+            // 处理之后的数据
+            manageData: [],
+            // 交叉表数据
+            orderColumns: [
+                { title: '款式', key: 'style', align: 'center' },
+                { title: '颜色', key: 'color', align: 'center' }
+            ],
+            // 控制model的开关显示
+            bShowModel_details: false,
+            bShowModel_add: false,
+            // 下拉选择器当前显示的内容
+            newItem: {
+                style: '',
+                color: '',
+                size: ''
+            },
+            current_style: '',
+            current_color: '',
+            sizeMap: [],
+            // 打开对话框
+            bShowDetails: false, // 显示订单详情的对话框
+            bDelete: false, // 确认删除对话框
+            // 将要删除的内容
+            wannaDelete: {
+                columns: [
+                    { title: '订单号', key: 'id', width: 150, align: 'center' },
+                    { title: '客户名称', key: 'name' }
+                ],
+                data: []
+            },
+            // 当前点击行的订单object
+            currentOrder: {},
+            // 显示修改订单内容的对话框
+            isShowdetailsEdit: false,
+            // 订单内容的单行数据
+            detailsItem: {}
+
+                    
+        
+                // 订单详情的导出
+        exportExcel_detail() {
+            // console.log(this.currentOrder)
+            // if (this.currentOrder.length) {
+            //     let params = {
+            //         title: ['订单号', '客户名称', '订单日期', '交货日期'],
+            //         key: ['id', 'name', 'startDate', 'endDate'],
+            //         data: dataCopy,
+            //         autoWidth: true,
+            //         filename: '订单表'
+            //     }
+            //     excel.export_array_to_excel(params)
+            //     this.exportLoading = false
+            // } else {
+            //     this.$Message.info('表格数据不能为空！')
+            // }
+        },
+        
+        // 打开抽屉-新建item
+        openDrawer_newItem() {
+            this.drawer_new_item = true
+            console.log('显示新的抽屉')
+        },
+
+        // 打开删除的对话框,data为要删除的对象
+        deleteObject(data) {
+            let needToDel = this.wannaDelete.data
+            if (data) {
+                this.bDelete = true
+                console.log(data)
+                needToDel.push({ id: data.id, name: data.name })
+            } else {
+                console.log(this.selection)
+                let list = this.selection
+                if (list.length) {
+                    this.bDelete = true
+                    list.forEach(v => {
+                        needToDel.push({ id: v.id, name: v.name })
+                    })
+                } else {
+                    this.$Message.warning('没有选择任何数据!')
+                }
+            }
+        },
+        // 删除已选项
+        confirmToDelete() {
+            let that = this
+            // 勾选项 为 selection
+            // 调用axios 删除 selection 匹配的数据
+            // 数组
+            let needToDel = that.wannaDelete.data
+            // 删除完毕后之后更新数据源
+            console.log(that.tableData)
+            needToDel.forEach(v => {
+                that.tableData = that.tableData.filter(item => item.id !== v.id)
+            })
+
+            // 清空wannaDelete.data
+            that.wannaDelete.data = []
+        },
+        // 打开对话框修改 内容
+        onRowEdit(row) {
+            var that = this
+            that.bShowModel_details = true
+            that.order.id = row.id
+            that.order.name = row.name
+            that.order.startDate = row.startDate
+            that.order.endDate = row.endDate
+            // 将数据源 填充
+            that.manageData = manage(row.details)
+            // 重新生成尺码表
+            that.orderColumns = getColumns()
+            console.log(that.orderColumns)
+            // 添加 操作按钮
+        },
+        // 订单修改提交
+        confirmEdit(data) {},
+
+        edit_count() {},
+        // 确认修改操作
+        ok() {
+            console.log(this.order)
+            // 调用axios
+        },
+        // 修改订单信息
+        handleEdit(params) {
+            console.log(params)
+            let item = this.detailsItem
+            item.style = params.row.style
+            item.color = params.row.color
+            item.size = []
+
+            this.isShowdetailsEdit = true
+
+            let size = Object.keys(params.row)
+            let removeString = ['style', 'color', 'step', '_index', '_rowKey']
+            // 去除非尺码字段
+            size = size.filter(v => !removeString.includes(v))
+            size.forEach(e => {
+                let c = params.row[e]
+                item.size.push({ size: e, count: c })
+            })
+            console.log(item)
+        },
+        // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
+        remove(index) {
+            let data = this.order.data
+            data.splice(index, 1)
+            this.manageData = manage(data)
+        }

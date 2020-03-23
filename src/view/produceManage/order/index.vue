@@ -15,212 +15,23 @@
       <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
       <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
     </div>
-    <Modal title="添加订单" v-model="drawer_new_item" width="90%">
-      <Form :model="formData">
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="客户名称" label-position="top">
-              <Input v-model="formData.name" placeholder="请输入客户名称"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单日期" label-position="top">
-              <DatePicker placeholder="Select date" type="date"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="交货日期" label-position="top">
-              <DatePicker placeholder="Select date" type="date"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单详情" label-position="top">
-              <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click="drawer_new_item= false">取消</Button>
-        <Button type="primary" @click="submit(formData)">提交</Button>
-      </div>
-    </Modal>
-    <Modal title="订单详情" v-model="bShowDetails">
-      <Row>
-        <Col span="12" offset="6" align="center">
-          <h2>{{currentOrder.name}}</h2>
-        </Col>
-      </Row>
-      <Row type="flex" justify="space-between">
-        <Col span="6">
-          <h4>订单号:{{currentOrder.id}}</h4>
-        </Col>
-        <Col span="8" align="right">
-          <h4>订单日期:{{currentOrder.startDate}}</h4>
-        </Col>
-        <Col span="8" align="right">
-          <h4>交货日期:{{currentOrder.endDate}}</h4>
-        </Col>
-      </Row>
-      <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-      <div class="demo-drawer-footer">
-        <Button
-          icon="md-download"
-          :loading="exportLoading"
-          @click="exportExcel_detail"
-          disabled
-        >导出为Csv文件</Button>
-      </div>
-    </Modal>
-    <Modal
-      v-model="bShowModel_details"
-      title="订单详情"
-      @on-ok="ok()"
-      @on-canccel="that.bShowModel_details = false"
-      width="90%"
-    >
-      <Form :model="order">
-        <Row :gutter="32">
-          <Col span="8">
-            <FormItem label="客户名称" label-position="top">
-              <Input v-model="order.name" />
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="订单日期" label-position="top">
-              <DatePicker v-model="order.startDate"></DatePicker>
-            </FormItem>
-          </Col>
-
-          <Col span="12">
-            <FormItem label="交货日期" label-position="top">
-              <DatePicker v-model="order.endDate"></DatePicker>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="24">
-            <FormItem label="订单详情" label-position="top">
-              <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <Button type="primary" @click="additem">添加条目</Button>
-    </Modal>
-    <Modal
-      ref="addNewLine"
-      v-model="bShowModel_add"
-      title="新增条目"
-      :mask-closable="false"
-      @on-ok="addnewitemok('newItem')"
-      @on-cancel="bShowModel_add = false"
-    >
-      <Form :model="newItem" :rules="rulesNewItem">
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="款式" label-position="top" prop="style">
-              <Select
-                v-model="current_style"
-                filterable
-                allow-create
-                @on-create="handleCreate_style"
-                @blur="handleCreate_style"
-              >
-                <Option
-                  v-for="(item,index) in newItem.style"
-                  :key="index"
-                  :value="item.value"
-                >{{item.value}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="颜色" label-position="top" prop="color">
-              <Select
-                v-model="current_color"
-                filterable
-                allow-create
-                @on-create="handleCreate_color"
-                @blur="handleCreate_color"
-              >
-                <Option
-                  v-for="(item,index) in newItem.color"
-                  :key="index"
-                  :value="item.value"
-                >{{item.value}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="10">
-          <Col span="8" v-for="(item, index) in sizeMap" :key="index">
-            <FormItem label="尺码" label-position="top" prop="size">
-              <Select v-model="item.s" filterable>
-                <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="数量" label-position="top" prop="count">
-              <Input v-model="item.v" placeholder="输入件数" />
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
-    <Modal
-      v-model="bDelete"
-      title="您确认要删除以下内容吗?"
-      @on-ok="confirmToDelete()"
-      @on-cancel="bDelete = false"
-    >
-      <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
-    </Modal>
-
-    <Modal title="修改内容" v-model="isShowdetailsEdit">
-      <Form :model="detailsItem">
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="款式" label-position="top">
-              <Input v-model="detailsItem.style" disabled />
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="颜色" label-position="top">
-              <Input v-model="detailsItem.color" disabled />
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32" v-for="(item,index) in detailsItem.size" :key="index">
-          <Col span="12">
-            <FormItem :label="item.size" label-position="top">
-              <Input v-model="item.count" />
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
+    <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData" />
   </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
-import manage from './dataSourceAction'
+// import manage from './dataSourceAction'
 import excel from '@/libs/excel'
 // import validate from 'async-validator'
+import Order from './order'
 
 export default {
     name: 'tables_page',
     components: {
-        Tables
+        Tables,
+        Order
     },
     data() {
         return {
@@ -252,7 +63,8 @@ export default {
                                     'Button',
                                     {
                                         props: {
-                                            type: 'primary'
+                                            type: 'primary',
+                                            size: 'small'
                                         },
                                         style: { margin: '4px' },
                                         on: {
@@ -273,7 +85,7 @@ export default {
                                         style: { margin: '4px' },
                                         on: {
                                             click: () => {
-                                                this.onRowEdit(params.row)
+                                                this.editOrder(params.row)
                                             }
                                         }
                                     },
@@ -298,72 +110,12 @@ export default {
                 }
             ],
             tableData: [], // 主页表格数据源
-            drawer_new_item: false,
-            drawer_editinfo: false,
             exportLoading: false, // 下载按钮 载入状态
-            selection: [], // 勾选项
-            // 处理之后的数据
-            manageData: [],
-            // 交叉表数据
-            orderColumns: [
-                { title: '款式', key: 'style', align: 'center' },
-                { title: '颜色', key: 'color', align: 'center' }
-            ],
-            // 控制model的开关显示
-            bShowModel_details: false,
-            bShowModel_add: false,
-            // 下拉选择器当前显示的内容
-            newItem: {
-                style: '',
-                color: '',
-                size: ''
-            },
-            current_style: '',
-            current_color: '',
-            sizeMap: [],
-            // 打开对话框
-            bShowDetails: false, // 显示订单详情的对话框
-            bDelete: false, // 确认删除对话框
-            // 将要删除的内容
-            wannaDelete: {
-                columns: [
-                    { title: '订单号', key: 'id', width: 150, align: 'center' },
-                    { title: '客户名称', key: 'name' }
-                ],
-                data: []
-            },
-            // 当前点击行的订单object
-            currentOrder: {},
-            // 显示修改订单内容的对话框
-            isShowdetailsEdit: false,
-            // 订单内容的单行数据
-            detailsItem: {}
+            bShow_Order: false, // 控制查看详情对话框
+            sourceData: {} // 订单对象
         }
     },
     methods: {
-        // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
-        handleSpan({ row, column, rowIndex, columnIndex }) {
-            if (columnIndex === 0) {
-                return {
-                    rowspan: row.step === 0 ? 0 : row.step,
-                    colspan: row.step === 0 ? 0 : 1
-                }
-            }
-        },
-        // 显示详情页
-        showDetails(data) {
-            let deatil = data.details
-            this.currentOrder = data
-            // 显示对话框
-            this.bShowDetails = true
-            // 需要加工数据源 获得 合并跨度
-            this.manageData = manage(deatil)
-            // 生成尺码表
-            this.orderColumns = getColumns()
-            console.log(this.orderColumns)
-            // 数据填充
-            this.order.data = this.manageData
-        },
         exportExcel() {
             if (this.tableData.length) {
                 this.exportLoading = true
@@ -386,118 +138,23 @@ export default {
                 this.$Message.info('表格数据不能为空！')
             }
         },
-        // 订单详情的导出
-        exportExcel_detail() {
-            // console.log(this.currentOrder)
-            // if (this.currentOrder.length) {
-            //     let params = {
-            //         title: ['订单号', '客户名称', '订单日期', '交货日期'],
-            //         key: ['id', 'name', 'startDate', 'endDate'],
-            //         data: dataCopy,
-            //         autoWidth: true,
-            //         filename: '订单表'
-            //     }
-            //     excel.export_array_to_excel(params)
-            //     this.exportLoading = false
-            // } else {
-            //     this.$Message.info('表格数据不能为空！')
-            // }
-        },
+
         // 选项改变时触发
         selectionChange(selection) {
             this.selection = selection
         },
-        // 打开抽屉-新建item
-        openDrawer_newItem() {
-            this.drawer_new_item = true
-            console.log('显示新的抽屉')
+        // 显示详情页
+        showDetails(data) {
+            console.log(data)
+            this.bShow_Order = true // 显示
+            this.sourceData = data // 数据源
         },
-
-        // 打开删除的对话框,data为要删除的对象
-        deleteObject(data) {
-            let needToDel = this.wannaDelete.data
-            if (data) {
-                this.bDelete = true
-                console.log(data)
-                needToDel.push({ id: data.id, name: data.name })
-            } else {
-                console.log(this.selection)
-                let list = this.selection
-                if (list.length) {
-                    this.bDelete = true
-                    list.forEach(v => {
-                        needToDel.push({ id: v.id, name: v.name })
-                    })
-                } else {
-                    this.$Message.warning('没有选择任何数据!')
-                }
-            }
+        syncValue(val) {
+            this.bShow_Order = val
         },
-        // 删除已选项
-        confirmToDelete() {
-            let that = this
-            // 勾选项 为 selection
-            // 调用axios 删除 selection 匹配的数据
-            // 数组
-            let needToDel = that.wannaDelete.data
-            // 删除完毕后之后更新数据源
-            console.log(that.tableData)
-            needToDel.forEach(v => {
-                that.tableData = that.tableData.filter(item => item.id !== v.id)
-            })
-
-            // 清空wannaDelete.data
-            that.wannaDelete.data = []
-        },
-        // 打开对话框修改 内容
-        onRowEdit(row) {
-            var that = this
-            that.bShowModel_details = true
-            that.order.id = row.id
-            that.order.name = row.name
-            that.order.startDate = row.startDate
-            that.order.endDate = row.endDate
-            // 将数据源 填充
-            that.manageData = manage(row.details)
-            // 重新生成尺码表
-            that.orderColumns = getColumns()
-            console.log(that.orderColumns)
-            // 添加 操作按钮
-        },
-        // 订单修改提交
-        confirmEdit(data) {},
-
-        edit_count() {},
-        // 确认修改操作
-        ok() {
-            console.log(this.order)
-            // 调用axios
-        },
-        // 修改订单信息
-        handleEdit(params) {
-            console.log(params)
-            let item = this.detailsItem
-            item.style = params.row.style
-            item.color = params.row.color
-            item.size = []
-
-            this.isShowdetailsEdit = true
-
-            let size = Object.keys(params.row)
-            let removeString = ['style', 'color', 'step', '_index', '_rowKey']
-            // 去除非尺码字段
-            size = size.filter(v => !removeString.includes(v))
-            size.forEach(e => {
-                let c = params.row[e]
-                item.size.push({ size: e, count: c })
-            })
-            console.log(item)
-        },
-        // 删除一行数据之后 造成 合并单元格 规则出错 需要重新 修改规则
-        remove(index) {
-            let data = this.order.data
-            data.splice(index, 1)
-            this.manageData = manage(data)
+        // 修改订单
+        editOrder(data) {
+          console.log(data)
         }
     },
     mounted() {
@@ -506,12 +163,12 @@ export default {
         })
     },
     watch: {
-        bDelete: function() {
-            if (!this.bDelete) {
-                console.log('变量发生改变 false')
-                this.wannaDelete.data = []
-            }
-        }
+        // bDelete: function() {
+        //     if (!this.bDelete) {
+        //         console.log('变量发生改变 false')
+        //         this.wannaDelete.data = []
+        //     }
+        // }
     }
 }
 </script>
