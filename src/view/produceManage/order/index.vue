@@ -16,6 +16,7 @@
       <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
     </div>
     <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData" />
+    <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData"/>
   </div>
 </template>
 
@@ -26,12 +27,14 @@ import { getOrderData } from '@/api/data'
 import excel from '@/libs/excel'
 // import validate from 'async-validator'
 import Order from './order'
+import OrderEdit from './orderEdit'
 
 export default {
     name: 'tables_page',
     components: {
         Tables,
-        Order
+        Order,
+        OrderEdit
     },
     data() {
         return {
@@ -112,7 +115,8 @@ export default {
             tableData: [], // 主页表格数据源
             exportLoading: false, // 下载按钮 载入状态
             bShow_Order: false, // 控制查看详情对话框
-            sourceData: {} // 订单对象
+            sourceData: {}, // 订单对象
+            bShow_OrderEdit: false // 控制编辑订单的抽屉开启关闭
         }
     },
     methods: {
@@ -152,10 +156,15 @@ export default {
         syncValue(val) {
             this.bShow_Order = val
         },
+        syncValueByEdit(val) {
+            this.bShow_OrderEdit = val
+        },
         // 修改订单
         editOrder(data) {
-          console.log(data)
-        }
+            this.bShow_OrderEdit = true
+            this.sourceData = data // 数据源
+        },
+        deleteObject() {}
     },
     mounted() {
         getOrderData().then(res => {

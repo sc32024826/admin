@@ -1,6 +1,6 @@
 <template>
-  <div @on-resultData="returnData">
-    <Drawer v-model="showOrder" title="订单详情" width="50%" :mask-closable="false" placement="left">
+  <div>
+    <Drawer v-model="bShowOrder" title="订单详情" width="50%" :mask-closable="false" placement="left">
       <Form :model="order">
         <Row :gutter="32">
           <Col span="12" offset="6" align="center">
@@ -29,7 +29,7 @@
               <Table
                 ref="tables"
                 :columns="columns"
-                :data="order.details"
+                :data="data"
                 border
                 stripe
                 :span-method="handleSpan"
@@ -51,16 +51,22 @@
   </div>
 </template>
 <script>
+import Manage from './dataSourceAction'
 import { getSize } from '@/api/utils'
 
 export default {
     name: 'order-edit',
-    props: {},
+    props: {
+        value: Boolean,
+        tableData: Object
+    },
     data() {
         return {
-            tableData: [],
+            data: [],
             columns: [],
-            isEdit: false
+            isEdit: false,
+            bShowOrder: false, // 控制本组件的显示与隐藏
+            order: {}
         }
     },
     methods: {
@@ -95,29 +101,26 @@ export default {
             // 需要把处理后的数据反馈给父组件
             this.returnData(this.tableData)
         },
-        returnData(data) {
-            this.$emit('on-resultData', data)
+        syncdata() {
+            this.$emit('on-resultData', this.bShowOrder)
         },
-        handleData(val) {
-            this.bShow = val
+        handleData(data) {
+            let manageData = Manage(data.details) // 根据款式 获得带step数据
+            console.log(manageData)
+            this.data = manageData
+            this.order = data
         },
         closeDrawer() {
             // console.log('3.关闭抽屉  false')
-            this.$store.commit('traggle')
+            // this.$store.commit('traggle')
+            console.log('关闭抽屉')
+            this.bShowOrder = false
         },
         getColumns() {
             this.columns = getColumns()
         }
     },
-    computed: {
-        showOrder() {
-            // console.log(this.$store.state.bShow_order)
-            return this.$store.state.bShow_order
-        },
-        order() {
-            return this.$store.state.order
-        }
-    },
+    computed: {},
     created() {
         let that = this
         let sizeMap = getSize()
@@ -150,6 +153,19 @@ export default {
                 }
             })
         })
+    },
+    watch: {
+        value(val) {
+            this.bShowOrder = val
+        },
+        tableData(val) {
+          this.handleData(val)
+        },
+        bShowOrder(val) {
+            if (val !== this.value) {
+                this.syncdata()
+            }
+        }
     }
 }
 </script>
