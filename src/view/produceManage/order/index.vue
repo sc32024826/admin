@@ -1,34 +1,35 @@
 <template>
     <div>
         <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-selection-change="selectionChange" />
-        <div class="bottom-button">
-            <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
-            <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
-            <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
-        </div>
         <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData_info" />
         <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData_edit" @on-edit="dataEdit" />
         <Modal v-model="bShowDel" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete()" @on-cancel="bShowDel = false">
             <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
         </Modal>
+        <ADDITEM v-model="bShowAdd" title="新增订单" @on-sync="syncAdd" />
+        <div class="bottom-button">
+            <Button type="primary" icon="md-add" @click="addNewItem" class="mr">新增订单</Button>
+            <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
+            <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+        </div>
     </div>
 </template>
 
 <script>
 import Tables from '_c/tables'
 import { getOrderData } from '@/api/data'
-// import manage from './dataSourceAction'
 import excel from '@/libs/excel'
-// import validate from 'async-validator'
 import Order from './order'
 import OrderEdit from './orderEdit'
+import ADDITEM from './addNewItem'
 
 export default {
     name: 'tables_page',
     components: {
         Tables,
         Order,
-        OrderEdit
+        OrderEdit,
+        ADDITEM
     },
     data () {
         return {
@@ -113,6 +114,7 @@ export default {
             sourceData_edit: {}, // 订单对象
             bShow_OrderEdit: false, // 控制编辑订单的抽屉开启关闭
             bShowDel: false, // 控制删除确认框
+            bShowAdd: false, // 控制新增订单
             wannaDelete: {
                 columns: [
                     { title: '订单号', key: 'id', width: 150, align: 'center' },
@@ -159,8 +161,13 @@ export default {
         syncValue (val) {
             this.bShow_Order = val
         },
+        // 当子组件 order-edit ...
         syncValueByEdit (val) {
             this.bShow_OrderEdit = val
+        },
+        // 当add-item 子组件显示状态发生改变时,同步值
+        syncAdd (val) {
+            this.bShowAdd = val
         },
         // 子组件中的表格数据修改
         dataEdit (val) {
@@ -222,6 +229,10 @@ export default {
 
             // 清空wannaDelete.data
             that.wannaDelete.data = []
+        },
+        addNewItem () {
+            this.bShowAdd = true
+            console.log('打开新增订单的对话框')
         }
     },
     mounted () {

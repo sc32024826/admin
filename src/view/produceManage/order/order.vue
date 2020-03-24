@@ -1,5 +1,5 @@
 <template>
-    <Card>
+    <div>
         <Modal title="订单详情" v-model="bShowDetails">
             <Row>
                 <Col span="12" offset="6" align="center">
@@ -22,7 +22,7 @@
                 <Button icon="md-download" :loading="exportLoading" @click="exportExcel_detail" disabled>导出为Csv文件</Button>
             </div>
         </Modal>
-    </Card>
+    </div>
 </template>
 <script>
 import Manage from './dataSourceAction'

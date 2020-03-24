@@ -33,7 +33,6 @@
                 <Button type="warning" icon="ios-hammer" @click="editDetails" class="mr">修改订单</Button>
                 <Button icon="md-checkmark" type="error" style="margin-right: 8px" @click="confirm" v-if="isEdit === true">确认修改</Button>
                 <Button icon="ios-undo" @click="closeDrawer">关闭界面</Button>
-
             </div>
         </Drawer>
     </div>

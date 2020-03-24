@@ -1,63 +1,136 @@
 <template>
-  <div>
-    <Modal
-      ref="addNewLine"
-      v-model="bShowModel_add"
-      title="新增条目"
-      :mask-closable="false"
-      @on-ok="addnewitemok('newItem')"
-      @on-cancel="bShowModel_add = false"
-    >
-      <Form :model="newItem" :rules="rulesNewItem">
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="款式" label-position="top" prop="style">
-              <Select
-                v-model="current_style"
-                filterable
-                allow-create
-                @on-create="handleCreate_style"
-                @blur="handleCreate_style"
-              >
-                <Option
-                  v-for="(item,index) in newItem.style"
-                  :key="index"
-                  :value="item.value"
-                >{{item.value}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="颜色" label-position="top" prop="color">
-              <Select
-                v-model="current_color"
-                filterable
-                allow-create
-                @on-create="handleCreate_color"
-                @blur="handleCreate_color"
-              >
-                <Option
-                  v-for="(item,index) in newItem.color"
-                  :key="index"
-                  :value="item.value"
-                >{{item.value}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="10">
-          <Col span="8" v-for="(item, index) in sizeMap" :key="index">
-            <FormItem label="尺码" label-position="top" prop="size">
-              <Select v-model="item.s" filterable>
-                <Option v-for="(v,k) in newItem.size" :key="k" :value="v.value">{{v.value}}</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="数量" label-position="top" prop="count">
-              <Input v-model="item.v" placeholder="输入件数" />
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
-  </div>
+    <div>
+        <Modal v-model="bShowModel_add" :title="title" width="50%" :mask-closable="false">
+            <Form :model="order">
+                <Row :gutter="32">
+                    <Col span="24">
+                    <FormItem label="客户名称:" label-position="top">
+                        <Input v-model="order.name" placeholder="请输入客户名称" />
+                    </FormItem>
+                    </Col>
+                </Row>
+                <Row :gutter="32" type="flex" justify="space-between">
+                    <Col span="12" align="right">
+                    <FormItem label="订单日期:" label-position="top">
+                        <DatePicker v-model="order.startDate" placeholder="请选择订单日期"></DatePicker>
+                    </FormItem>
+                    </Col>
+                    <Col span="12" align="right">
+                    <FormItem label="交货日期:" label-position="top">
+                        <DatePicker v-model="order.endDate" placeholder="请选择交货日期"></DatePicker>
+                    </FormItem>
+                    </Col>
+                </Row>
+                <Row :gutter="32">
+                    <Col span="24">
+                    <FormItem label="订单详情" label-position="top">
+                        <Table ref="tables" :columns="columns" :data="order.details" border stripe />
+                    </FormItem>
+                    </Col>
+                </Row>
+            </Form>
+            <div class="demo-drawer-footer">
+                <Button icon="md-add" style="margin-right: 8px" @click="addLine">增加一行</Button>
+                <Button icon="md-checkmark" type="primary" @click="submit">提交订单</Button>
+            </div>
+        </Modal>
+    </div>
 </template>
+<script>
+import { getSize } from '@/api/utils'
+export default {
+    name: 'add-item',
+    props: {
+        value: Boolean,
+        title: String
+    },
+    data () {
+        return {
+            bShowModel_add: false, // 控制本组件的开启和关闭
+            order: {},
+            sizeMap: [],
+            columns: [],
+            details: [], // 存放输入的订单详情数据
+            lineData: {}, // 存放订单详情的单行数据
+            col: [] // 存放字段名
+        }
+    },
+    methods: {
+        syncData () {
+            this.$emit('on-sync', this.bShowModel_add)
+        },
+        submit () {
+            this.order.details = this.details
+            console.log(this.order)
+        },
+        addLine () {
+            let obj = {}
+            this.col.forEach(e => {
+                obj[e] = ''
+            })
+            this.order.details.push(obj)
+            console.log(this.order.details)
+        },
+        // 输入框失去焦点时触发,e 为输入的值,val 为输入的字段名
+        setValue (e, params, val) {
+            let index = params.index
+            this.lineData[val] = e
+            this.details[index] = this.lineData
+        }
+    },
+    watch: {
+        value (val) {
+            this.bShowModel_add = val
+        },
+        bShowModel_add (val) {
+            if (val !== this.val) {
+                this.syncData()
+            }
+        }
+    },
+    created () {
+        // this.sizeMap = getSize()
+        let map = getSize()
+        let col = ['style', 'color']
+        map.forEach(i => {
+            this.sizeMap.push({ title: i })
+            col.push(i)
+        })
+        this.col = col
+        col.forEach(val => {
+            var t = val
+            if (val === 'style') {
+                t = '款式'
+            } else if (val === 'color') {
+                t = '颜色'
+            }
+            this.columns.push({
+                title: t,
+                key: val,
+                align: 'center',
+                render: (h, params) => {
+                    return h('Input', {
+                        props: {
+                            type: 'text',
+                            value: params.row[val]
+                        },
+                        on: {
+                            'on-blur': e => {
+                                if (e.target.value) {
+                                    this.setValue(e.target.value, params, val)
+                                }
+                            }
+                        }
+                    })
+                }
+            })
+        })
+        this.order.details = []
+        let obj = { style: '', color: '' }
+        map.forEach(v => {
+            obj[v] = ''
+        })
+        this.order.details.push(obj)
+    }
+}
+</script>
