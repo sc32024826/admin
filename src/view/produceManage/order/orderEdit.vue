@@ -24,9 +24,7 @@
                 <Row :gutter="32">
                     <Col span="24">
                     <FormItem label="订单详情" label-position="top">
-                        <!-- <Table :columns="orderColumns" :data="order.data" border :span-method="handleSpan"></Table> -->
-                        <!-- <Details :data="order.data" @on-resultData="getNewData" /> -->
-                        <Table ref="tables" :columns="columns" :data="data" border stripe :span-method="handleSpan" />
+                        <Table ref="tables" :columns="columns" :data="order.details" border stripe :span-method="handleSpan" />
                     </FormItem>
                     </Col>
                 </Row>
@@ -53,7 +51,6 @@ export default {
     },
     data () {
         return {
-            data: [],
             columns: [],
             isEdit: false,
             bShowOrder: false, // 控制本组件的显示与隐藏
@@ -75,37 +72,52 @@ export default {
                 this.$Message.warning('不要重复点击修改按钮')
             } else {
                 this.isEdit = true
-                console.log(this.order)
+                this.columns.push({
+                    title: '操作',
+                    key: 'action',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: { type: 'error', size: 'small' },
+                            on: {
+                                click: () => {
+                                    console.log('删除订单子项')
+                                    this.removeItem(params.index)
+                                }
+                            }
+                        }, '删除')
+                    }
+                })
             }
         },
         // 确认修改按钮
         confirm () {
             this.isEdit = false
+            console.log(this.order)
             // axios
             // 需要把时间格式重新转换成yyyy-MM-dd格式
             let temp = this.order
             temp.startDate = timeFormat(temp.startDate)
             temp.endDate = timeFormat(temp.endDate)
             console.log(temp)
+            this.removeAction()
             this.$emit('on-edit', temp)
         },
-        // data标识 tableData中的index
-        remove (index) {
-            this.tableData = this.tableData.filter((v, k) => k !== index)
+        removeItem (index) {
+            let comp = this.order.details.filter((v, k) => k !== index)
             // 删除一行数据 之后 需要对表格规则重新  计算
-            this.tableData = manage(this.tableData)
-            console.log(this.tableData)
-            // 需要把处理后的数据反馈给父组件
-            this.returnData(this.tableData)
+            comp = Manage(comp)
+            console.log(comp)
+            this.order.details = comp
         },
         syncdata () {
             this.$emit('on-resultData', this.bShowOrder)
         },
         handleData (data) {
+            console.log('handle')
+            this.order = data
             let manageData = Manage(data.details) // 根据款式 获得带step数据
             console.log(manageData)
-            this.data = manageData
-            this.order = data
+            this.order.details = manageData
         },
         closeDrawer () {
             // console.log('3.关闭抽屉  false')
@@ -122,6 +134,14 @@ export default {
         },
         getColumns () {
             this.columns = getColumns()
+        },
+        // 删除表里边的操作字段
+        removeAction () {
+            let len = this.columns.length
+            if (this.columns[len - 1].key === 'action') {
+                console.log('移除操作按钮')
+                this.columns.pop()
+            }
         }
     },
     computed: {},
@@ -145,8 +165,8 @@ export default {
                             on: {
                                 'on-blur': e => {
                                     params.row[v] = e.target.value
-                                    console.log(params.index)
-                                    this.data[params.index][v] =
+                                    let t = this.order.details
+                                    t[params.index][v] =
                                         e.target.value
                                 }
                             }
@@ -165,9 +185,13 @@ export default {
         tableData (val) {
             this.handleData(val)
         },
+        // 关闭抽屉时
         bShowOrder (val) {
             if (val !== this.value) {
                 this.syncdata()
+            }
+            if (!val) {
+                this.removeAction()
             }
         }
     }

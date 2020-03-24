@@ -1,26 +1,4 @@
-  <Modal title="修改内容" v-model="isShowdetailsEdit">
-      <Form :model="detailsItem">
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="款式" label-position="top">
-              <Input v-model="detailsItem.style" disabled />
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="颜色" label-position="top">
-              <Input v-model="detailsItem.color" disabled />
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32" v-for="(item,index) in detailsItem.size" :key="index">
-          <Col span="12">
-            <FormItem :label="item.size" label-position="top">
-              <Input v-model="item.count" />
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
+
 
      rulesNewItem: {
                 style: {
@@ -172,14 +150,6 @@
             // 打开对话框
             bShowDetails: false, // 显示订单详情的对话框
             bDelete: false, // 确认删除对话框
-            // 将要删除的内容
-            wannaDelete: {
-                columns: [
-                    { title: '订单号', key: 'id', width: 150, align: 'center' },
-                    { title: '客户名称', key: 'name' }
-                ],
-                data: []
-            },
             // 当前点击行的订单object
             currentOrder: {},
             // 显示修改订单内容的对话框
@@ -212,43 +182,7 @@
             this.drawer_new_item = true
             console.log('显示新的抽屉')
         },
-
-        // 打开删除的对话框,data为要删除的对象
-        deleteObject(data) {
-            let needToDel = this.wannaDelete.data
-            if (data) {
-                this.bDelete = true
-                console.log(data)
-                needToDel.push({ id: data.id, name: data.name })
-            } else {
-                console.log(this.selection)
-                let list = this.selection
-                if (list.length) {
-                    this.bDelete = true
-                    list.forEach(v => {
-                        needToDel.push({ id: v.id, name: v.name })
-                    })
-                } else {
-                    this.$Message.warning('没有选择任何数据!')
-                }
-            }
-        },
-        // 删除已选项
-        confirmToDelete() {
-            let that = this
-            // 勾选项 为 selection
-            // 调用axios 删除 selection 匹配的数据
-            // 数组
-            let needToDel = that.wannaDelete.data
-            // 删除完毕后之后更新数据源
-            console.log(that.tableData)
-            needToDel.forEach(v => {
-                that.tableData = that.tableData.filter(item => item.id !== v.id)
-            })
-
-            // 清空wannaDelete.data
-            that.wannaDelete.data = []
-        },
+       
         // 打开对话框修改 内容
         onRowEdit(row) {
             var that = this

@@ -8,6 +8,9 @@
         </div>
         <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData_info" />
         <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData_edit" @on-edit="dataEdit" />
+        <Modal v-model="bShowDel" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete()" @on-cancel="bShowDel = false">
+            <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+        </Modal>
     </div>
 </template>
 
@@ -108,7 +111,15 @@ export default {
             bShow_Order: false, // 控制查看详情对话框
             sourceData_info: {}, // 订单对象
             sourceData_edit: {}, // 订单对象
-            bShow_OrderEdit: false // 控制编辑订单的抽屉开启关闭
+            bShow_OrderEdit: false, // 控制编辑订单的抽屉开启关闭
+            bShowDel: false, // 控制删除确认框
+            wannaDelete: {
+                columns: [
+                    { title: '订单号', key: 'id', width: 150, align: 'center' },
+                    { title: '客户名称', key: 'name' }
+                ],
+                data: []
+            }// 将要被删除的数据
         }
     },
     methods: {
@@ -176,7 +187,42 @@ export default {
             this.bShow_OrderEdit = true
             this.sourceData_edit = bak // 数据源
         },
-        deleteObject () { }
+        // 批量删除与单行删除
+        deleteObject (data) {
+            let needToDel = this.wannaDelete.data
+            if (data) {
+                this.bShowDel = true
+                console.log(data)
+                needToDel.push({ id: data.id, name: data.name })
+            } else {
+                console.log(this.selection)
+                let list = this.selection
+                if (list.length) {
+                    this.bShowDel = true
+                    list.forEach(v => {
+                        needToDel.push({ id: v.id, name: v.name })
+                    })
+                } else {
+                    this.$Message.warning('没有选择任何数据!')
+                }
+            }
+        },
+        // 删除已选项
+        confirmToDelete () {
+            let that = this
+            // 勾选项 为 selection
+            // 调用axios 删除 selection 匹配的数据
+            // 数组
+            let needToDel = that.wannaDelete.data
+            // 删除完毕后之后更新数据源
+            console.log(that.tableData)
+            needToDel.forEach(v => {
+                that.tableData = that.tableData.filter(item => item.id !== v.id)
+            })
+
+            // 清空wannaDelete.data
+            that.wannaDelete.data = []
+        }
     },
     mounted () {
         getOrderData().then(res => {
@@ -184,12 +230,12 @@ export default {
         })
     },
     watch: {
-        // bDelete: function() {
-        //     if (!this.bDelete) {
-        //         console.log('变量发生改变 false')
-        //         this.wannaDelete.data = []
-        //     }
-        // }
+        bShowDel: function () {
+            if (!this.bShowDel) {
+                console.log('变量发生改变 false')
+                this.wannaDelete.data = []
+            }
+        }
     }
 }
 </script>
