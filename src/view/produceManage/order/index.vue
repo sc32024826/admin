@@ -1,23 +1,14 @@
 <template>
-  <div>
-    <tables
-      ref="tables"
-      stripe
-      editable
-      searchable
-      search-place="top"
-      v-model="tableData"
-      :columns="columns"
-      @on-selection-change="selectionChange"
-    />
-    <div class="bottom-button">
-      <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
-      <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
-      <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+    <div>
+        <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-selection-change="selectionChange" />
+        <div class="bottom-button">
+            <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
+            <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
+            <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+        </div>
+        <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData_info" />
+        <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData_edit" @on-edit="dataEdit" />
     </div>
-    <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData" />
-    <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData"/>
-  </div>
 </template>
 
 <script>
@@ -36,7 +27,7 @@ export default {
         Order,
         OrderEdit
     },
-    data() {
+    data () {
         return {
             columns: [
                 {
@@ -115,12 +106,13 @@ export default {
             tableData: [], // 主页表格数据源
             exportLoading: false, // 下载按钮 载入状态
             bShow_Order: false, // 控制查看详情对话框
-            sourceData: {}, // 订单对象
+            sourceData_info: {}, // 订单对象
+            sourceData_edit: {}, // 订单对象
             bShow_OrderEdit: false // 控制编辑订单的抽屉开启关闭
         }
     },
     methods: {
-        exportExcel() {
+        exportExcel () {
             if (this.tableData.length) {
                 this.exportLoading = true
                 let dataCopy = this.tableData.slice(0)
@@ -144,29 +136,49 @@ export default {
         },
 
         // 选项改变时触发
-        selectionChange(selection) {
+        selectionChange (selection) {
             this.selection = selection
         },
         // 显示详情页
-        showDetails(data) {
+        showDetails (data) {
             console.log(data)
             this.bShow_Order = true // 显示
-            this.sourceData = data // 数据源
+            this.sourceData_info = data // 数据源
         },
-        syncValue(val) {
+        syncValue (val) {
             this.bShow_Order = val
         },
-        syncValueByEdit(val) {
+        syncValueByEdit (val) {
             this.bShow_OrderEdit = val
         },
-        // 修改订单
-        editOrder(data) {
-            this.bShow_OrderEdit = true
-            this.sourceData = data // 数据源
+        // 子组件中的表格数据修改
+        dataEdit (val) {
+            console.log(val)
+            // 在子组件中修改了数据源,此处最好查询数据并更新以刷新表单
+            let temp = this.tableData
+            temp.forEach(item => {
+                if (item.id === val.id) {
+                    console.log('匹配数据,修改')
+                    // item = val
+                    Object.assign(item, val)
+                }
+            })
+            console.log(temp)
         },
-        deleteObject() {}
+        // 修改订单
+        editOrder (data) {
+            console.log('copy an object')
+            console.log(data)
+            // 需要备份一个order 对象 用以修改数据
+            let bak = {}
+            Object.assign(bak, data)
+            console.log(bak)
+            this.bShow_OrderEdit = true
+            this.sourceData_edit = bak // 数据源
+        },
+        deleteObject () { }
     },
-    mounted() {
+    mounted () {
         getOrderData().then(res => {
             this.tableData = res.data
         })
