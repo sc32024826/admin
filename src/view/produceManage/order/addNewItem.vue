@@ -24,7 +24,7 @@
                 <Row :gutter="32">
                     <Col span="24">
                     <FormItem label="订单详情" label-position="top">
-                        <Table ref="tables" :columns="columns" :data="order.details" border stripe />
+                        <Table ref="tables" :columns="columns" :data="temp" border stripe />
                     </FormItem>
                     </Col>
                 </Row>
@@ -52,7 +52,8 @@ export default {
             columns: [],
             details: [], // 存放输入的订单详情数据
             lineData: {}, // 存放订单详情的单行数据
-            col: [] // 存放字段名
+            col: [], // 存放字段名
+            temp: [] // 存放临时订单详情数据
         }
     },
     methods: {
@@ -68,14 +69,22 @@ export default {
             this.col.forEach(e => {
                 obj[e] = ''
             })
-            this.order.details.push(obj)
-            console.log(this.order.details)
+            this.temp.push(obj)
+            console.log(obj)
+            console.log(this.temp)
+        },
+        removeLine (params) {
+            console.log(params.index)
+            this.temp = this.temp.filter((v, k) => k !== params.index)
+            console.log(this.temp)
         },
         // 输入框失去焦点时触发,e 为输入的值,val 为输入的字段名
         setValue (e, params, val) {
+            console.log('触发一次')
             let index = params.index
             this.lineData[val] = e
-            this.details[index] = this.lineData
+            this.temp[index] = this.lineData
+            this.lineData = {} // 此处注意,必须清空
         }
     },
     watch: {
@@ -125,12 +134,30 @@ export default {
                 }
             })
         })
-        this.order.details = []
+        this.columns.push({
+            title: '操作',
+            key: 'action',
+            align: 'center',
+            render: (h, params) => {
+                return h('Button', {
+                    props: {
+                        type: 'error',
+                        icon: 'ios-trash',
+                        size: 'small'
+                    },
+                    on: {
+                        click: () => {
+                            this.removeLine(params)
+                        }
+                    }
+                }, '删除')
+            }
+        })
         let obj = { style: '', color: '' }
         map.forEach(v => {
             obj[v] = ''
         })
-        this.order.details.push(obj)
+        this.temp.push(obj)
     }
 }
 </script>
