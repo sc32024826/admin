@@ -61,10 +61,11 @@ export default {
             this.$emit('on-sync', this.bShowModel_add)
         },
         submit () {
-            this.order.details = this.details
+            this.order.details = this.temp
             console.log(this.order)
         },
         addLine () {
+            this.lineData = {} // 此处注意,必须清空
             let obj = {}
             this.col.forEach(e => {
                 obj[e] = ''
@@ -80,11 +81,12 @@ export default {
         },
         // 输入框失去焦点时触发,e 为输入的值,val 为输入的字段名
         setValue (e, params, val) {
-            console.log('触发一次')
             let index = params.index
             this.lineData[val] = e
             this.temp[index] = this.lineData
-            this.lineData = {} // 此处注意,必须清空
+            console.log('修改' + index + '行,' + val + '字段为:' + e)
+            console.log('linedata:')
+            console.log(this.lineData)
         }
     },
     watch: {
