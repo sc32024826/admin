@@ -1,62 +1,47 @@
 <template>
-  <div>
-    <tables
-      ref="tables"
-      stripe
-      editable
-      searchable
-      search-place="top"
-      v-model="tableData"
-      :columns="columns"
-      @on-delete="handleDelete"
-      @on-selection-change="selectionChange"
-    />
-    <div class="bottom-button">
-      <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新增订单</Button>
-      <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
-      <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+    <div>
+        <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-delete="handleDelete" @on-selection-change="selectionChange" />
+        <div class="bottom-button">
+            <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新建客户档案</Button>
+            <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
+            <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
+        </div>
+        <Drawer title="添加客户信息" v-model="drawer_new_em" width="720" :mask-closable="false">
+            <Form :model="formData">
+                <Row :gutter="32">
+                    <Col span="12">
+                    <FormItem label="客户简称" label-position="top">
+                        <Input v-model="formData.nichen" placeholder="请输入客户简称" />
+                    </FormItem>
+                    </Col>
+                    <Col span="12">
+                    <FormItem label="客户全称" label-position="top">
+                        <Input v-model="formData.name" placeholder="请输入客户全称"></Input>
+                    </FormItem>
+                    </Col>
+                </Row>
+                <Row :gutter="32">
+                    <Col span="12">
+                    <FormItem label="联系人姓名" label-position="top">
+                        <Input v-model="formData.contact" placeholder="请输入联系人姓名"></Input>
+                    </FormItem>
+                    </Col>
+                    <Col span="12">
+                    <FormItem label="联系人电话" label-position="top">
+                        <Input v-model="formData.tel" placeholder="请输入联系人电话"></Input>
+                    </FormItem>
+                    </Col>
+                </Row>
+            </Form>
+            <div class="demo-drawer-footer">
+                <Button style="margin: 8px" @click=" drawer_new_em= false">取消</Button>
+                <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
+            </div>
+        </Drawer>
+        <Modal v-model="bDelete" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete" @on-cancel="bDelete = false">
+            <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
+        </Modal>
     </div>
-    <Drawer title="添加客户信息" v-model="drawer_new_em" width="720" :mask-closable="false">
-      <Form :model="formData">
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="客户简称" label-position="top">
-              <Input v-model="formData.nichen" placeholder="请输入客户简称" />
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="客户全称" label-position="top">
-              <Input v-model="formData.name" placeholder="请输入客户全称"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row :gutter="32">
-          <Col span="12">
-            <FormItem label="联系人姓名" label-position="top">
-              <Input v-model="formData.contact" placeholder="请输入联系人姓名"></Input>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="联系人电话" label-position="top">
-              <Input v-model="formData.tel" placeholder="请输入联系人电话"></Input>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <div class="demo-drawer-footer">
-        <Button style="margin: 8px" @click=" drawer_new_em= false">取消</Button>
-        <Button type="primary" @click="employeeSubmit(formData)">提交</Button>
-      </div>
-    </Drawer>
-    <Modal
-      v-model="bDelete"
-      title="您确认要删除以下内容吗?"
-      @on-ok="confirmToDelete"
-      @on-cancel="bDelete = false"
-    >
-      <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
-    </Modal>
-  </div>
 </template>
 
 <script>
@@ -69,7 +54,7 @@ export default {
     components: {
         Tables
     },
-    data() {
+    data () {
         return {
             columns: [
                 {
@@ -129,10 +114,10 @@ export default {
         }
     },
     methods: {
-        handleDelete(params) {
+        handleDelete (params) {
             console.log(params)
         },
-        exportExcel() {
+        exportExcel () {
             if (this.tableData.length) {
                 this.exportLoading = true
                 let dataCopy = this.tableData.slice(0)
@@ -162,21 +147,21 @@ export default {
             }
         },
         // 选项改变时触发
-        selectionChange(selection) {
+        selectionChange (selection) {
             this.selection = selection
         },
         // 打开抽屉-新建员工
-        addNewEmployee() {
+        addNewEmployee () {
             this.drawer_new_em = true
         },
-        employeeSubmit(formData) {
+        employeeSubmit (formData) {
             console.log('新增员工')
             console.log(formData)
 
             // axios
         },
         // 打开批量删除的对话框
-        deleteObject(data) {
+        deleteObject (data) {
             let needToDel = this.wannaDelete.data
             console.log(data)
             if (data) {
@@ -207,7 +192,7 @@ export default {
             }
         },
         // 删除已选项
-        confirmToDelete() {
+        confirmToDelete () {
             let that = this
             // 勾选项 为 selection
             // 调用axios 删除 selection 匹配的数据
@@ -223,7 +208,7 @@ export default {
             that.wannaDelete.data = []
         },
         // 修改操作
-        paramsEdit(params) {
+        paramsEdit (params) {
             console.log(params)
             // 关键字段
             // params.row.id
@@ -233,13 +218,13 @@ export default {
             // 调用axios 更新数据源
         }
     },
-    mounted() {
+    mounted () {
         getGuestData().then(res => {
             this.tableData = res.data
         })
     },
     watch: {
-        bDelete: function() {
+        bDelete: function () {
             if (!this.bDelete) {
                 this.wannaDelete.data = []
             }

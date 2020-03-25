@@ -112,10 +112,11 @@ export const getOrgData = req => {
 
 export const getDevicesData = req => {
   let tableData = []
-  doCustomTimes(5, () => {
+  doCustomTimes(3, () => {
     tableData.push(Mock.mock({
+      group: Random.integer(100, 105).toString(),
       id: Random.increment(10),
-      deviceName: '@name'
+      address: Random.ip()
     }))
   })
   return tableData

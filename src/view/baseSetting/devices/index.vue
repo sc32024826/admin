@@ -1,115 +1,68 @@
 <template>
-  <div>
-    <Row>
-      <Col span="8">
-        <Table :columns="titleColumns" :data="titleData" :span-method="handleSpan" border stripe></Table>
-      </Col>
-      <Col span="16">
-        <Table ref="tables" :columns="columns" :data="tableData" border stripe>
-        </Table>
-      </Col>
-    </Row>
-
-    <div class="bottom-button">
-      <Button type="primary" icon="ios-hammer" @click="editDetails" class="mr">修改订单数量</Button>
-      <Button
-        type="warning"
-        icon="md-checkmark"
-        v-if="isEdit === true"
-        @click="confirmToSubmit()"
-      >确认修改</Button>
+    <div>
+        <Table :columns="columns" :data="titleData" border stripe />
     </div>
-  </div>
 </template>
 
 <script>
-import { getOrderData } from '@/api/data'
-import { getSize } from '@/api/utils'
-import manage from '../../produceManage/order/dataSourceAction'
+import { getDevicesData } from '@/api/data'
+import getGroup from './getGroup'
 
 export default {
     name: 'device-manage',
     components: {},
-    data() {
+    data () {
         return {
-            titleColumns: [
-                { title: '款式', key: 'style', align: 'center' },
-                { title: '颜色', key: 'color', align: 'center' }
+            columns: [
+                { title: '分组', key: 'group', align: 'center' },
+                { title: '设备号', key: 'id', align: 'center' },
+                { title: 'IP地址', key: 'address', align: 'center' }
             ],
-            titleData: [],
-            columns: [],
-            orderData: {},
-            tableData: [],
-            isEdit: false,
-            // 正要修改项的值
-            sizeList: []
+            titleData: []
         }
     },
     methods: {
-        // 交叉表 单元格格式规则, { row, cloumns, rowIndex, columnsIndex }
-        handleSpan({ row, column, rowIndex, columnIndex }) {
-            if (columnIndex === 0) {
-                return {
-                    rowspan: row.step === 0 ? 0 : row.step,
-                    colspan: row.step === 0 ? 0 : 1
+    },
+    mounted () {
+        getDevicesData().then(res => {
+            this.titleData = res.data
+        })
+    },
+    created () {
+        let group = getGroup()
+        console.log(group)
+        let arr = []
+        group.forEach((v, k) => {
+            arr.push({
+                label: v,
+                value: k + 1
+            })
+        })
+        console.log(arr)
+        let temp = {
+            title: '分组',
+            key: 'group',
+            align: 'center',
+            filters: arr,
+            filterMultiple: false,
+            filterMethod (value, row) {
+                switch (value) {
+                    case 1:
+                        return row.group === '100'
+                    case 2:
+                        return row.group === '101'
+                    case 3:
+                        return row.group === '102'
+                    case 4:
+                        return row.group === '103'
+                    case 5:
+                        return row.group === '104'
                 }
             }
-        },
-        editDetails() {
-            if (this.isEdit) {
-                this.$Message.warning('不要重复点击修改按钮')
-            } else {
-                this.isEdit = true
-            }
-        },
-        confirmToSubmit() {
-            this.isEdit = false
-            // axios
         }
-    },
-    mounted() {
-        getOrderData().then(res => {
-            let data = res.data[0].details
-            console.log(data)
-            this.tableData = data
-            let list = []
-            data.forEach(v => {
-                list.push({ style: v.style, color: v.color })
-            })
-            this.titleData = manage(list)
-        })
-    },
-    created() {
-        let that = this
-        let sizeMap = getSize()
-        that.sizeList = sizeMap
-        sizeMap.forEach(v => {
-            that.columns.push({
-                title: v,
-                key: v
-            })
-        })
-        console.log(that.sizeList)
+        this.columns.shift()
+        this.columns.unshift(temp)
+        console.log(this.columns)
     }
 }
 </script>
-
-<style>
-.demo-drawer-footer {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border-top: 1px solid #e8e8e8;
-    padding: 10px 16px;
-    text-align: right;
-    background: #fff;
-}
-.bottom-button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-.mr {
-    margin-right: 10px;
-}
-</style>
