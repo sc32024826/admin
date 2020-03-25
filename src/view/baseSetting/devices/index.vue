@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Table :columns="columns" :data="titleData" border stripe />
+        <Table :loading="loading" :columns="columns" :data="titleData" border stripe />
     </div>
 </template>
 
@@ -13,6 +13,7 @@ export default {
     components: {},
     data () {
         return {
+            loading: true,
             columns: [
                 { title: '分组', key: 'group', align: 'center' },
                 { title: '设备号', key: 'id', align: 'center' },

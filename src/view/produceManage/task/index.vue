@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Table ref="tables" :columns="columns" :data="tableData" border stripe />
+        <Table ref="tables" :loading="loading" :columns="columns" :data="tableData" border stripe />
     </div>
 </template>
 
@@ -12,6 +12,7 @@ export default {
     components: {},
     data () {
         return {
+            loading: true,
             columns: [
                 { title: '订单号', key: 'orderID', align: 'center' },
                 { title: '生产单号', key: 'proID', align: 'center' },

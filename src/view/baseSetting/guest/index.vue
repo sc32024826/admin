@@ -1,6 +1,6 @@
 <template>
     <div>
-        <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-delete="handleDelete" @on-selection-change="selectionChange" />
+        <tables ref="tables" stripe editable searchable search-place="top" :loading="loading" v-model="tableData" :columns="columns" @on-delete="handleDelete" @on-selection-change="selectionChange" />
         <div class="bottom-button">
             <Button type="primary" icon="md-add" @click="drawer_new_em = true" class="mr">新建客户档案</Button>
             <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
@@ -56,6 +56,7 @@ export default {
     },
     data () {
         return {
+            loading: true,
             columns: [
                 {
                     type: 'selection',
