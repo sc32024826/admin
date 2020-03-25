@@ -6,7 +6,7 @@
         <Modal v-model="bShowDel" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete()" @on-cancel="bShowDel = false">
             <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
         </Modal>
-        <ADDITEM v-model="bShowAdd" title="新增订单" @on-sync="syncAdd" />
+        <ADDITEM v-model="bShowAdd" title="新增订单" @on-sync="syncAdd" @on-addOrder="addOrderSuccess" />
         <div class="bottom-button">
             <Button type="primary" icon="md-add" @click="addNewItem" class="mr">新增订单</Button>
             <Button type="error" icon="md-trash" @click="deleteObject()" class="mr">批量删除订单</Button>
@@ -154,6 +154,7 @@ export default {
         },
         // 显示详情页
         showDetails (data) {
+            console.log('点击了显示详情按钮')
             console.log(data)
             this.bShow_Order = true // 显示
             this.sourceData_info = data // 数据源
@@ -185,7 +186,7 @@ export default {
         },
         // 修改订单
         editOrder (data) {
-            console.log('copy an object')
+            console.log('打开修改订单抽屉')
             console.log(data)
             // 需要备份一个order 对象 用以修改数据
             let bak = {}
@@ -233,6 +234,12 @@ export default {
         addNewItem () {
             this.bShowAdd = true
             console.log('打开新增订单的对话框')
+        },
+        addOrderSuccess (order) {
+            console.log(order)
+            this.tableData.push(order)
+            console.log(this.tableData)
+            // 当前操作有报错,后期调用数据库之后应该可以解决这个问题
         }
     },
     mounted () {

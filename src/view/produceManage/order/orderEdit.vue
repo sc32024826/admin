@@ -112,7 +112,6 @@ export default {
             this.$emit('on-resultData', this.bShowOrder)
         },
         handleData (data) {
-            console.log('handle')
             this.order = data
             let manageData = Manage(data.details) // 根据款式 获得带step数据
             console.log(manageData)
@@ -182,7 +181,12 @@ export default {
             this.bShowOrder = val
         },
         tableData (val) {
-            this.handleData(val)
+            console.log('orderEdit 组件数据源改变')
+            if (this.bShowOrder) {
+                this.handleData(val)
+            } else {
+                console.log('由于本组件未显示,不进行数据handle')
+            }
         },
         // 关闭抽屉时
         bShowOrder (val) {

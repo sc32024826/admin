@@ -38,6 +38,8 @@
 </template>
 <script>
 import { getSize } from '@/api/utils'
+import timeFormat from './time'
+
 export default {
     name: 'add-item',
     props: {
@@ -63,6 +65,11 @@ export default {
         submit () {
             this.order.details = this.temp
             console.log(this.order)
+            this.order.startDate = timeFormat(this.order.startDate)
+            this.order.endDate = timeFormat(this.order.endDate)
+            this.$emit('on-addOrder', this.order)
+            // 数据提交之后,清空本组件数据
+            this.clear()
         },
         addLine () {
             this.lineData = {} // 此处注意,必须清空
@@ -87,6 +94,16 @@ export default {
             console.log('修改' + index + '行,' + val + '字段为:' + e)
             console.log('linedata:')
             console.log(this.lineData)
+        },
+        clear () {
+            this.bShowModel_add = false
+            this.order = {}
+            this.sizeMap = []
+            this.columns = []
+            this.details = []
+            this.lineData = {}
+            this.col = []
+            this.temp = []
         }
     },
     watch: {

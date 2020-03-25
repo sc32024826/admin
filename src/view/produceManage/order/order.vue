@@ -73,8 +73,13 @@ export default {
             this.bShowDetails = val
         },
         tableData (val) {
-            console.log('数据源改变')
-            this.hanldeSourceData(val)
+            console.log('查看订单详情组件,数据源改变')
+            // 当本组件不显示的时候不进行数据handle
+            if (this.bShowDetails) {
+                this.hanldeSourceData(val)
+            } else {
+                console.log('当本组件不显示的时候不进行数据handle')
+            }
         },
         bShowDetails (val) {
             if (val !== this.value) {
