@@ -1,6 +1,6 @@
 import Mock from 'mockjs'
 import { login, logout, getUserInfo } from './login'
-import { getEmployeeData, getGuestData, getOrderData, uploadImage, getOrgData, getDevicesData } from './data'
+import { getEmployeeData, getGuestData, getOrderData, getComputersData, getOrgData, getDevicesData, getTaskData } from './data'
 import { getMessageInit, getContentByMsgId, hasRead, removeReaded, restoreTrash, messageCount } from './user'
 
 // 配置Ajax请求延时，可用来测试网络延迟大时项目中一些效果
@@ -16,7 +16,8 @@ Mock.mock(/\/get_table_data/, getEmployeeData)
 Mock.mock(/\/get_guest_data/, getGuestData)
 Mock.mock(/\/order_manage/, getOrderData)
 Mock.mock(/\/save_error_logger/, 'success')
-Mock.mock(/\/image\/upload/, uploadImage)
+Mock.mock(/\/get_computers_data/, getComputersData)
+Mock.mock(/\/get_task_data/, getTaskData)
 Mock.mock(/\/message\/init/, getMessageInit)
 Mock.mock(/\/message\/content/, getContentByMsgId)
 Mock.mock(/\/message\/has_read/, hasRead)

@@ -102,8 +102,32 @@ export const getOrderData = req => {
   return tableData
 }
 
-export const uploadImage = req => {
-  return Promise.resolve()
+export const getComputersData = req => {
+  let tableData = []
+  doCustomTimes(25, () => {
+    tableData.push(Mock.mock({
+      id: Random.increment(10),
+      orderID: Random.increment(11),
+      filename: Random.word(),
+      state: Random.natural(1, 3)
+    }))
+  })
+  return tableData
+}
+export const getTaskData = req => {
+  let tableData = []
+  doCustomTimes(25, () => {
+    tableData.push(Mock.mock({
+      orderID: Random.increment(11),
+      proID: Random.increment(10),
+      style: Random.cword(3, 4),
+      color: Random.color(),
+      size: Random.string('SML', 1, 1),
+      filename: Random.word(),
+      count: Random.natural(100, 1000)
+    }))
+  })
+  return tableData
 }
 
 export const getOrgData = req => {
@@ -112,7 +136,7 @@ export const getOrgData = req => {
 
 export const getDevicesData = req => {
   let tableData = []
-  doCustomTimes(3, () => {
+  doCustomTimes(25, () => {
     tableData.push(Mock.mock({
       group: Random.integer(100, 105).toString(),
       id: Random.increment(10),

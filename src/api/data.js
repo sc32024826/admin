@@ -35,7 +35,20 @@ export const getDevicesData = () => {
     method: 'get'
   })
 }
-
+// 获取设备信息
+export const getComputersData = () => {
+  return axios.request({
+    url: 'get_computers_data',
+    method: 'get'
+  })
+}
+// 获取设备信息
+export const getTaskData = () => {
+  return axios.request({
+    url: 'get_task_data',
+    method: 'get'
+  })
+}
 export const errorReq = () => {
   return axios.request({
     url: 'error_url',

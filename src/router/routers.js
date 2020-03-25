@@ -143,14 +143,6 @@ export default [
           title: '产量报表'
         },
         component: () => import('@/view/excel/upload-excel.vue')
-      },
-      {
-        path: 'none',
-        name: 'none',
-        meta: {
-          icon: 'md-close',
-          title: 'none'
-        }
       }
     ]
   },
@@ -170,15 +162,7 @@ export default [
           icon: 'md-pulse',
           title: '电脑机实时状态'
         },
-        component: () => import('@/view/tools-methods/tools-methods.vue')
-      },
-      {
-        path: 'none',
-        name: 'none',
-        meta: {
-          icon: 'md-close',
-          title: 'none'
-        }
+        component: () => import('@/view/manageView/computer/index.vue')
       }
     ]
   },
