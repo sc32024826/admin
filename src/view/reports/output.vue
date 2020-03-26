@@ -14,9 +14,13 @@
                 <DatePicker type="daterange" placement="bottom-end" placeholder="选择时间段" style="width: 200px" v-if="showme" v-model="condition.dateRange"></DatePicker>
                 <Button type="primary" class="selectBtn" @click="filtrate" icon="md-reorder">筛选</Button>
             </Form>
-
         </div>
         <Tables :columns="columns" v-model="tableData" border stripe :loading="loading" searchable search-place="top" />
+        <div style="margin: 10px;overflow: hidden">
+            <div style="float: left;">
+                <Page :total="dataCount" :current="currentPage" @on-change="changePage" @on-page-size-change="sizeSetter" show-sizer :page-size="pageSize"></Page>
+            </div>
+        </div>
         <div class="bottom-button">
             <Button icon="md-download" :loading="exportLoading" @click="exportExcel">导出为Csv文件</Button>
         </div>
@@ -47,25 +51,31 @@ export default {
                 { title: '机器号', key: 'meachine', align: 'center' },
                 { title: '日期', key: 'date', align: 'center' }
             ],
+            totalData: [], // 未分页总数据
             tableData: [],
             exportLoading: false,
             condition: {}, // 列表筛选条件
             aCondition: [{ value: '员工' }, { value: '机器号' }, { value: '客户' }, { value: '订单号' }], // 可筛选的内容
             showme: false, // 是否显示时间区间选择
-            condition2: '' // 单选框选择的内容
+            condition2: '', // 单选框选择的内容
+            dataCount: 0, // 表格数据量
+            currentPage: 1, // 当前分页码
+            pageSize: 10 // 每页显示数量
         }
     },
     mounted () {
         getReportsData().then(res => {
-            this.tableData = res.data
+            this.totalData = res.data
             this.loading = false
+            this.dataCount = res.data.length
+            this.tableData = this.pageData()
         })
     },
     methods: {
         exportExcel () {
-            if (this.tableData.length) {
+            if (this.totalData.length) {
                 this.exportLoading = true
-                let dataCopy = this.tableData.slice(0)
+                let dataCopy = this.totalData.slice(0)
                 // 遇到长数字比如身份证时需要在数字前添加'\t',否则cvs显示会异常
                 // dataCopy.forEach(v => {
                 //     v.id = '\t' + v.id
@@ -147,7 +157,33 @@ export default {
             console.log(this.columns)
             this.columns.unshift(item)
             console.log(this.columns)
+        },
+        // val 为新的页码
+        changePage (val) {
+            let _start = (val - 1) * this.pageSize
+            let _end = val * this.pageSize
+            this.tableData = this.totalData.slice(_start, _end)
+        },
+        // 表格数据分页处理
+        pageData () {
+            let data = []
+            if (this.dataCount < this.pageSize) {
+                data = this.totalData
+            } else {
+                console.log(this.totalData)
+                data = this.totalData.slice(0, this.pageSize)
+            }
+            return data
+        },
+        // 设置每页显示数量
+        sizeSetter (val) {
+            this.pageSize = val
+            // 修改每页显示数量之后 需要重新更新数据表
+            this.tableData = this.totalData.slice(0, val)
         }
+    },
+    computed: {
+
     },
     watch: {
         condition2 (val) {
