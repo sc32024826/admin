@@ -12,7 +12,7 @@
                     <Radio label="自定义" border></Radio>
                 </RadioGroup>
                 <DatePicker type="daterange" placement="bottom-end" placeholder="选择时间段" style="width: 200px" v-if="showme" v-model="condition.dateRange"></DatePicker>
-                <Button type="primary" class="selectBtn" @click="filtrate">筛选</Button>
+                <Button type="primary" class="selectBtn" @click="filtrate" icon="md-reorder">筛选</Button>
             </Form>
 
         </div>
@@ -50,7 +50,7 @@ export default {
             tableData: [],
             exportLoading: false,
             condition: {}, // 列表筛选条件
-            aCondition: [{ value: '员工' }, { value: '机台' }, { value: '客户' }, { value: '订单' }], // 可筛选的内容
+            aCondition: [{ value: '员工' }, { value: '机器号' }, { value: '客户' }, { value: '订单号' }], // 可筛选的内容
             showme: false, // 是否显示时间区间选择
             condition2: '' // 单选框选择的内容
         }
@@ -92,8 +92,61 @@ export default {
         },
         // 按照条件筛选表格数据或者重新请求数据
         filtrate () {
-            console.log(this.condition)
-            console.log(this.condition2)
+            let col = this.condition.catgroy
+            if (!col) {
+                this.$Message.error('请选择筛选条件!')
+                return
+            }
+            let date = this.condition2
+            if (!this.condition2) {
+                this.$Message.error('请选择日期!')
+                return
+            } else {
+                switch (this.condition2) {
+                    case '当日':
+                        console.log('当日')
+                        break
+                    case '昨天':
+                        console.log('昨天')
+                        break
+                    case '7天':
+                        console.log('7天')
+                        break
+                    case '自定义':
+                        if (this.condition.dateRange[0] === '') {
+                            this.$Message.error('请选择日期范围!')
+                            return
+                        } else {
+                            date = this.condition.dateRange
+                        }
+                        break
+                }
+            }
+
+            let filterObj = {
+                catgroy: col,
+                date: date
+            }
+            // 更新字段排列
+            this.updateColumns(col)
+            // 更新tabledata 数据  注意日期格式 是否需要转换
+            console.log(filterObj)
+        },
+        // 将筛选的字段 左移到最左边你
+        updateColumns (selectCol) {
+            console.log(selectCol)
+            var index = 0
+            var item = {}
+            this.columns.forEach((v, k) => {
+                if (v.title === selectCol) {
+                    index = k
+                    item = v
+                }
+            })
+            this.columns.splice(index, 1)
+            console.log(this.columns)
+            this.columns.unshift(item)
+            console.log(this.columns)
         }
     },
     watch: {
