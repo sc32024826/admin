@@ -42,10 +42,17 @@ export const getComputersData = () => {
     method: 'get'
   })
 }
-// 获取设备信息
+// 获取生产任务信息
 export const getTaskData = () => {
   return axios.request({
     url: 'get_task_data',
+    method: 'get'
+  })
+}
+// 获取报表信息
+export const getReportsData = () => {
+  return axios.request({
+    url: 'get_reports_data',
     method: 'get'
   })
 }

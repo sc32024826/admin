@@ -47,6 +47,7 @@
 <script>
 import Tables from '_c/tables'
 import { getGuestData } from '@/api/data'
+import { dateFormat } from '@/api/utils'
 import excel from '@/libs/excel'
 
 export default {
@@ -58,12 +59,7 @@ export default {
         return {
             loading: true,
             columns: [
-                {
-                    type: 'selection',
-                    width: '60',
-                    align: 'center',
-                    key: 'sele'
-                },
+                { type: 'selection', width: '60', align: 'center', key: 'sele' },
                 { title: '编号', key: 'id', sortable: true },
                 { title: '客户简称', key: 'nichen' },
                 { title: '客户全称', key: 'name' },
@@ -74,34 +70,24 @@ export default {
                     key: 'action',
                     align: 'center',
                     render: (h, params) => {
-                        return h(
-                            'Button',
+                        return h('Button',
                             {
-                                props: {
-                                    type: 'error'
-                                },
+                                props: { type: 'error' },
                                 style: {},
                                 on: {
                                     click: () => {
                                         this.deleteObject(params.row)
                                     }
                                 }
-                            },
-                            '删除'
-                        )
+                            }, '删除')
                     }
                 }
             ],
             tableData: [],
             drawer_new_em: false,
             bDelete: false,
-            formData: {
-                id: '',
-                name: '',
-                department: ''
-            },
+            formData: {},
             selection: [],
-            allDepartment: [],
             // 将要删除的内容
             wannaDelete: {
                 columns: [
@@ -129,17 +115,11 @@ export default {
                 })
                 console.log(dataCopy)
                 let params = {
-                    title: [
-                        '编号',
-                        '客户简称',
-                        '客户全称',
-                        '联系人姓名',
-                        '联系人电话'
-                    ],
+                    title: ['编号', '客户简称', '客户全称', '联系人姓名', '联系人电话'],
                     key: ['id', 'nichen', 'name', 'contact', 'tel'],
                     data: dataCopy,
                     autoWidth: true,
-                    filename: `客户表-${new Date().valueOf()}.csv`
+                    filename: '客户表' + dateFormat('YYYY-mm-dd HH:MM', new Date())
                 }
                 excel.export_array_to_excel(params)
                 this.exportLoading = false
@@ -222,6 +202,7 @@ export default {
     mounted () {
         getGuestData().then(res => {
             this.tableData = res.data
+            this.loading = false
         })
     },
     watch: {

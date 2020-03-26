@@ -45,6 +45,7 @@
 <script>
 import Tables from '_c/tables'
 import { getEmployeeData } from '@/api/data'
+import { dateFormat } from '@/api/utils'
 import excel from '@/libs/excel'
 
 export default {
@@ -54,12 +55,7 @@ export default {
         return {
             loading: true,
             columns: [
-                {
-                    type: 'selection',
-                    width: '60',
-                    align: 'center',
-                    key: 'sele'
-                },
+                { type: 'selection', width: '60', align: 'center', key: 'sele' },
                 { title: '工号', key: 'id', sortable: true },
                 { title: '姓名', key: 'name' },
                 { title: '部门', key: 'department' },
@@ -73,15 +69,11 @@ export default {
                                 h(
                                     'Button',
                                     {
-                                        props: {
-                                            type: 'warning'
-                                        },
+                                        props: { type: 'warning', size: 'small' },
                                         style: { 'margin-right': '4px' },
                                         on: {
                                             click: () => {
-                                                this.editEmployeeInfo(
-                                                    params.row
-                                                )
+                                                this.editEmployeeInfo(params.row)
                                             }
                                         }
                                     },
@@ -90,7 +82,7 @@ export default {
                                 h(
                                     'Button',
                                     {
-                                        props: { type: 'error' },
+                                        props: { type: 'error', size: 'small' },
                                         on: {
                                             click: () => {
                                                 this.deleteObject(params.row)
@@ -135,9 +127,7 @@ export default {
             let list = this.departmentList
             if (data) {
                 data.forEach(v => {
-                    !list.includes(v.department)
-                        ? list.push({ val: v.department })
-                        : list
+                    !list.includes(v.department) ? list.push({ val: v.department }) : list
                 })
             }
         },
@@ -154,7 +144,7 @@ export default {
                     key: ['id', 'name', 'department'],
                     data: dataCopy,
                     autoWidth: true,
-                    filename: '员工表'
+                    filename: '员工表' + dateFormat('YYYY-mm-dd HH:MM', new Date())
                 }
                 excel.export_array_to_excel(params)
                 this.exportLoading = false
@@ -238,6 +228,7 @@ export default {
         getEmployeeData().then(res => {
             this.tableData = res.data
             this.departmentAction()
+            this.loading = false
         })
     },
     watch: {

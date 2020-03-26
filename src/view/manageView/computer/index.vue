@@ -1,13 +1,16 @@
 <template>
     <div>
-        <Table :columns="columns" :data="titleData" border stripe />
+        <tables :columns="columns" v-model="tableData" border stripe searchable search-place="top" />
     </div>
 </template>
+
 <script>
+import Tables from '_c/tables'
 import { getComputersData } from '@/api/data'
+
 export default {
     name: 'computer-state',
-    components: {},
+    components: { Tables },
     data () {
         return {
             columns: [
@@ -16,14 +19,14 @@ export default {
                 { title: '当前使用文件名', key: 'filename', align: 'center' },
                 { title: '当前状态', key: 'state', align: 'center' }
             ],
-            titleData: []
+            tableData: []
         }
     },
     methods: {
     },
     mounted () {
         getComputersData().then(res => {
-            this.titleData = res.data
+            this.tableData = res.data
         })
     }
 }

@@ -142,7 +142,7 @@ export default [
           icon: 'md-stats',
           title: '产量报表'
         },
-        component: () => import('@/view/excel/upload-excel.vue')
+        component: () => import('@/view/reports/output.vue')
       }
     ]
   },

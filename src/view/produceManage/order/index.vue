@@ -1,6 +1,6 @@
 <template>
     <div>
-        <tables ref="tables" stripe editable searchable search-place="top" v-model="tableData" :columns="columns" @on-selection-change="selectionChange" />
+        <tables ref="tables" stripe :loading="loading" searchable search-place="top" v-model="tableData" :columns="columns" @on-selection-change="selectionChange" />
         <Order v-model="bShow_Order" @on-sync="syncValue" :tableData="sourceData_info" />
         <OrderEdit v-model="bShow_OrderEdit" @on-resultData="syncValueByEdit" :tableData="sourceData_edit" @on-edit="dataEdit" />
         <Modal v-model="bShowDel" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete()" @on-cancel="bShowDel = false">
@@ -21,6 +21,7 @@ import { getOrderData } from '@/api/data'
 import excel from '@/libs/excel'
 import Order from './order'
 import OrderEdit from './orderEdit'
+import { dateFormat } from '@/api/utils'
 import ADDITEM from './addNewItem'
 
 export default {
@@ -33,20 +34,10 @@ export default {
     },
     data () {
         return {
+            loading: true,
             columns: [
-                {
-                    type: 'selection',
-                    width: '60',
-                    align: 'center',
-                    key: 'sele'
-                },
-                {
-                    title: '订单号',
-                    key: 'id',
-                    sortable: true,
-                    width: 150,
-                    align: 'center'
-                },
+                { type: 'selection', width: '60', align: 'center', key: 'sele' },
+                { title: '订单号', key: 'id', sortable: true, width: 150, align: 'center' },
                 { title: '客户名称', key: 'name' },
                 { title: '订单日期', key: 'startDate' },
                 { title: '交货日期', key: 'endDate' },
@@ -55,55 +46,41 @@ export default {
                     key: 'action',
                     align: 'center',
                     render: (h, params) => {
-                        return [
-                            h('div', [
-                                h(
-                                    'Button',
-                                    {
-                                        props: {
-                                            type: 'primary',
-                                            size: 'small'
-                                        },
-                                        style: { margin: '4px' },
-                                        on: {
-                                            click: () => {
-                                                this.showDetails(params.row)
-                                            }
-                                        }
-                                    },
-                                    '查看'
-                                ),
-                                h(
-                                    'Button',
-                                    {
-                                        props: {
-                                            type: 'warning',
-                                            size: 'small'
-                                        },
-                                        style: { margin: '4px' },
-                                        on: {
-                                            click: () => {
-                                                this.editOrder(params.row)
-                                            }
-                                        }
-                                    },
-                                    '修改'
-                                ),
-                                h(
-                                    'Button',
-                                    {
-                                        props: { type: 'error', size: 'small' },
-                                        style: { margin: '4px' },
-                                        on: {
-                                            click: () => {
-                                                this.deleteObject(params.row)
-                                            }
-                                        }
-                                    },
-                                    '删除'
-                                )
-                            ])
-                        ]
+                        return [h('div', [h('Button',
+                            {
+                                props: { type: 'primary', size: 'small' },
+                                style: { margin: '4px' },
+                                on: {
+                                    click: () => {
+                                        this.showDetails(params.row)
+                                    }
+                                }
+                            }, '查看'
+                        ),
+                        h('Button',
+                            {
+                                props: { type: 'warning', size: 'small' },
+                                style: { margin: '4px' },
+                                on: {
+                                    click: () => {
+                                        this.editOrder(params.row)
+                                    }
+                                }
+                            },
+                            '修改'
+                        ),
+                        h('Button',
+                            {
+                                props: { type: 'error', size: 'small' },
+                                style: { margin: '4px' },
+                                on: {
+                                    click: () => {
+                                        this.deleteObject(params.row)
+                                    }
+                                }
+                            }, '删除'
+                        )]
+                        )]
                     }
                 }
             ],
@@ -139,7 +116,7 @@ export default {
                     key: ['id', 'name', 'startDate', 'endDate'],
                     data: dataCopy,
                     autoWidth: true,
-                    filename: '订单表'
+                    filename: '订单表' + dateFormat('YYYY-mm-dd HH:MM', new Date())
                 }
                 excel.export_array_to_excel(params)
                 this.exportLoading = false
@@ -245,6 +222,7 @@ export default {
     mounted () {
         getOrderData().then(res => {
             this.tableData = res.data
+            this.loading = false
         })
     },
     watch: {
