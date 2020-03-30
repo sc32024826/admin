@@ -14,7 +14,7 @@ module.exports = {
     }],
     'no-undef': 'off',
     'camelcase': 'off',
-    'indent': ['off', 2],
+    'indent': ['off', 4],
     'no-tabs': 'off',
     "space-before-function-paren": 0,
     'no-unused-expressions': 0

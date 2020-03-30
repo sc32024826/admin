@@ -51,13 +51,14 @@ export default {
                 { title: '机器号', key: 'meachine', align: 'center' },
                 { title: '日期', key: 'date', align: 'center' }
             ],
-            totalData: [], // 未分页总数据
             tableData: [],
             exportLoading: false,
             condition: {}, // 列表筛选条件
             aCondition: [{ value: '员工' }, { value: '机器号' }, { value: '客户' }, { value: '订单号' }], // 可筛选的内容
             showme: false, // 是否显示时间区间选择
             condition2: '', // 单选框选择的内容
+            // 分页相关属性
+            totalData: [], // 未分页总数据
             dataCount: 0, // 表格数据量
             currentPage: 1, // 当前分页码
             pageSize: 10 // 每页显示数量
@@ -144,7 +145,6 @@ export default {
         },
         // 将筛选的字段 左移到最左边你
         updateColumns (selectCol) {
-            console.log(selectCol)
             var index = 0
             var item = {}
             this.columns.forEach((v, k) => {
@@ -154,9 +154,7 @@ export default {
                 }
             })
             this.columns.splice(index, 1)
-            console.log(this.columns)
             this.columns.unshift(item)
-            console.log(this.columns)
         },
         // val 为新的页码
         changePage (val) {
