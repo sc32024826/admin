@@ -23,13 +23,14 @@ export default [
         name: 'login',
         meta: {
             title: 'Login - 登录',
-            hideInMenu: true
+            hideInMenu: true,
+            requireAuth: true
         },
         component: () => import('@/view/login/login.vue')
     },
     {
         path: '/callback',
-        name: 'callback',
+        name: 'LoginCallbackView',
         meta: {
             hideInMenu: true
         },
@@ -42,7 +43,8 @@ export default [
         component: Main,
         meta: {
             hideInMenu: true,
-            notCache: true
+            notCache: true,
+            requireAuth: true
         },
         children: [
             {
@@ -52,7 +54,8 @@ export default [
                     hideInMenu: true,
                     title: '首页',
                     notCache: true,
-                    icon: 'md-home'
+                    icon: 'md-home',
+                    requireAuth: true
                 },
                 component: () => import('@/view/single-page/home')
             }
@@ -63,7 +66,8 @@ export default [
         name: 'setting',
         meta: {
             icon: 'md-settings',
-            title: '基础设置'
+            title: '基础设置',
+            requireAuth: true
         },
         component: Main,
         children: [
@@ -72,7 +76,8 @@ export default [
                 name: 'employeeManage',
                 meta: {
                     icon: 'md-people',
-                    title: '人员管理'
+                    title: '人员管理',
+                    requireAuth: true
                 },
                 component: () => import('@/view/baseSetting/employee/index.vue')
             },
@@ -81,7 +86,8 @@ export default [
                 name: 'orgManage',
                 meta: {
                     icon: 'md-podium',
-                    title: '组织架构管理'
+                    title: '组织架构管理',
+                    requireAuth: true
                 },
                 component: () => import('@/view/baseSetting/org/index.vue')
             },
@@ -90,7 +96,8 @@ export default [
                 name: 'guestManage',
                 meta: {
                     icon: 'md-contacts',
-                    title: '客户管理'
+                    title: '客户管理',
+                    requireAuth: true
                 },
                 component: () => import('@/view/baseSetting/guest/index.vue')
             },
@@ -99,7 +106,8 @@ export default [
                 name: 'deviceManage',
                 meta: {
                     icon: 'ios-desktop',
-                    title: '设备管理'
+                    title: '设备管理',
+                    requireAuth: true
                 },
                 component: () => import('@/view/baseSetting/devices/index.vue')
             }
@@ -110,7 +118,8 @@ export default [
         name: 'produceManage',
         meta: {
             icon: 'md-cloud-upload',
-            title: '生产管理'
+            title: '生产管理',
+            requireAuth: true
         },
         component: Main,
         children: [
@@ -119,7 +128,8 @@ export default [
                 name: 'orderMangee',
                 meta: {
                     icon: 'ios-document',
-                    title: '订单管理'
+                    title: '订单管理',
+                    requireAuth: true
                 },
                 component: () => import('@/view/produceManage/order/index.vue')
             },
@@ -128,7 +138,8 @@ export default [
                 name: 'mission',
                 meta: {
                     icon: 'md-clipboard',
-                    title: '生产任务'
+                    title: '生产任务',
+                    requireAuth: true
                 },
                 component: () => import('@/view/produceManage/task/index.vue')
             }
@@ -139,7 +150,8 @@ export default [
         name: 'report',
         meta: {
             icon: 'ios-stats',
-            title: '统计报表'
+            title: '统计报表',
+            requireAuth: true
         },
         component: Main,
         children: [
@@ -148,7 +160,8 @@ export default [
                 name: 'production_report',
                 meta: {
                     icon: 'md-stats',
-                    title: '产量报表'
+                    title: '产量报表',
+                    requireAuth: true
                 },
                 component: () => import('@/view/reports/output.vue')
             }
@@ -159,7 +172,8 @@ export default [
         name: 'manage_view',
         meta: {
             icon: 'ios-pie',
-            title: '管理看板'
+            title: '管理看板',
+            requireAuth: true
         },
         component: Main,
         children: [
@@ -168,7 +182,8 @@ export default [
                 name: 'computer_state',
                 meta: {
                     icon: 'md-pulse',
-                    title: '电脑机实时状态'
+                    title: '电脑机实时状态',
+                    requireAuth: true
                 },
                 component: () => import('@/view/manageView/computer/index.vue')
             }

@@ -1,10 +1,8 @@
 <template>
     <div>
         <div desktop=12 tablet=8>
-            <dl>
-                <dt>Login successful</dt>
-                <dt>Your browser should be redirected soon</dt>
-            </dl>
+            <h1>Login successful</h1>
+            <h1>Your browser should be redirected soon</h1>
         </div>
     </div>
 </template>
@@ -22,6 +20,8 @@ export default {
             // 核心的就是这里了
             await applicationUserManager.signinRedirectCallback()
             let user = await applicationUserManager.getUser()
+            console.log(user)
+            debugger
             // 将 token 存储在客户端
             this.$store.commit('saveToken', user.access_token)
             // 调整首页
