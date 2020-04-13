@@ -18,207 +18,215 @@ import Main from '@/components/main'
  */
 
 export default [
-  {
-    path: '/login',
-    name: 'login',
-    meta: {
-      title: 'Login - 登录',
-      hideInMenu: true
+    {
+        path: '/login',
+        name: 'login',
+        meta: {
+            title: 'Login - 登录',
+            hideInMenu: true
+        },
+        component: () => import('@/view/login/login.vue')
     },
-    component: () => import('@/view/login/login.vue')
-  },
-  {
-    path: '/',
-    name: '_home',
-    redirect: '/home',
-    component: Main,
-    meta: {
-      hideInMenu: true,
-      notCache: true
+    {
+        path: '/callback',
+        name: 'callback',
+        meta: {
+            hideInMenu: true
+        },
+        component: () => import('@/view/LoginCallbackView.vue')
     },
-    children: [
-      {
-        path: '/home',
-        name: 'home',
+    {
+        path: '/',
+        name: '_home',
+        redirect: '/home',
+        component: Main,
         meta: {
-          hideInMenu: true,
-          title: '首页',
-          notCache: true,
-          icon: 'md-home'
+            hideInMenu: true,
+            notCache: true
         },
-        component: () => import('@/view/single-page/home')
-      }
-    ]
-  },
-  {
-    path: '/base_setting',
-    name: 'setting',
-    meta: {
-      icon: 'md-settings',
-      title: '基础设置'
+        children: [
+            {
+                path: '/home',
+                name: 'home',
+                meta: {
+                    hideInMenu: true,
+                    title: '首页',
+                    notCache: true,
+                    icon: 'md-home'
+                },
+                component: () => import('@/view/single-page/home')
+            }
+        ]
     },
-    component: Main,
-    children: [
-      {
-        path: 'employee',
-        name: 'employeeManage',
+    {
+        path: '/base_setting',
+        name: 'setting',
         meta: {
-          icon: 'md-people',
-          title: '人员管理'
+            icon: 'md-settings',
+            title: '基础设置'
         },
-        component: () => import('@/view/baseSetting/employee/index.vue')
-      },
-      {
-        path: 'org',
-        name: 'orgManage',
-        meta: {
-          icon: 'md-podium',
-          title: '组织架构管理'
-        },
-        component: () => import('@/view/baseSetting/org/index.vue')
-      },
-      {
-        path: 'guest_manage',
-        name: 'guestManage',
-        meta: {
-          icon: 'md-contacts',
-          title: '客户管理'
-        },
-        component: () => import('@/view/baseSetting/guest/index.vue')
-      },
-      {
-        path: 'device_manage',
-        name: 'deviceManage',
-        meta: {
-          icon: 'ios-desktop',
-          title: '设备管理'
-        },
-        component: () => import('@/view/baseSetting/devices/index.vue')
-      }
-    ]
-  },
-  {
-    path: '/produce_manage',
-    name: 'produceManage',
-    meta: {
-      icon: 'md-cloud-upload',
-      title: '生产管理'
+        component: Main,
+        children: [
+            {
+                path: 'employee',
+                name: 'employeeManage',
+                meta: {
+                    icon: 'md-people',
+                    title: '人员管理'
+                },
+                component: () => import('@/view/baseSetting/employee/index.vue')
+            },
+            {
+                path: 'org',
+                name: 'orgManage',
+                meta: {
+                    icon: 'md-podium',
+                    title: '组织架构管理'
+                },
+                component: () => import('@/view/baseSetting/org/index.vue')
+            },
+            {
+                path: 'guest_manage',
+                name: 'guestManage',
+                meta: {
+                    icon: 'md-contacts',
+                    title: '客户管理'
+                },
+                component: () => import('@/view/baseSetting/guest/index.vue')
+            },
+            {
+                path: 'device_manage',
+                name: 'deviceManage',
+                meta: {
+                    icon: 'ios-desktop',
+                    title: '设备管理'
+                },
+                component: () => import('@/view/baseSetting/devices/index.vue')
+            }
+        ]
     },
-    component: Main,
-    children: [
-      {
-        path: 'order_manage',
-        name: 'orderMangee',
+    {
+        path: '/produce_manage',
+        name: 'produceManage',
         meta: {
-          icon: 'ios-document',
-          title: '订单管理'
+            icon: 'md-cloud-upload',
+            title: '生产管理'
         },
-        component: () => import('@/view/produceManage/order/index.vue')
-      },
-      {
-        path: 'mission',
-        name: 'mission',
+        component: Main,
+        children: [
+            {
+                path: 'order_manage',
+                name: 'orderMangee',
+                meta: {
+                    icon: 'ios-document',
+                    title: '订单管理'
+                },
+                component: () => import('@/view/produceManage/order/index.vue')
+            },
+            {
+                path: 'mission',
+                name: 'mission',
+                meta: {
+                    icon: 'md-clipboard',
+                    title: '生产任务'
+                },
+                component: () => import('@/view/produceManage/task/index.vue')
+            }
+        ]
+    },
+    {
+        path: '/report',
+        name: 'report',
         meta: {
-          icon: 'md-clipboard',
-          title: '生产任务'
+            icon: 'ios-stats',
+            title: '统计报表'
         },
-        component: () => import('@/view/produceManage/task/index.vue')
-      }
-    ]
-  },
-  {
-    path: '/report',
-    name: 'report',
-    meta: {
-      icon: 'ios-stats',
-      title: '统计报表'
+        component: Main,
+        children: [
+            {
+                path: 'production_report',
+                name: 'production_report',
+                meta: {
+                    icon: 'md-stats',
+                    title: '产量报表'
+                },
+                component: () => import('@/view/reports/output.vue')
+            }
+        ]
     },
-    component: Main,
-    children: [
-      {
-        path: 'production_report',
-        name: 'production_report',
+    {
+        path: '/manage_view',
+        name: 'manage_view',
         meta: {
-          icon: 'md-stats',
-          title: '产量报表'
+            icon: 'ios-pie',
+            title: '管理看板'
         },
-        component: () => import('@/view/reports/output.vue')
-      }
-    ]
-  },
-  {
-    path: '/manage_view',
-    name: 'manage_view',
-    meta: {
-      icon: 'ios-pie',
-      title: '管理看板'
+        component: Main,
+        children: [
+            {
+                path: 'computer_state',
+                name: 'computer_state',
+                meta: {
+                    icon: 'md-pulse',
+                    title: '电脑机实时状态'
+                },
+                component: () => import('@/view/manageView/computer/index.vue')
+            }
+        ]
     },
-    component: Main,
-    children: [
-      {
-        path: 'computer_state',
-        name: 'computer_state',
+    {
+        path: '/argu',
+        name: 'argu',
         meta: {
-          icon: 'md-pulse',
-          title: '电脑机实时状态'
+            hideInMenu: true
         },
-        component: () => import('@/view/manageView/computer/index.vue')
-      }
-    ]
-  },
-  {
-    path: '/argu',
-    name: 'argu',
-    meta: {
-      hideInMenu: true
+        component: Main,
+        children: [
+            {
+                path: 'params/:id',
+                name: 'params',
+                meta: {
+                    icon: 'md-flower',
+                    title: route => `{{ params }}-${route.params.id}`,
+                    notCache: true,
+                    beforeCloseName: 'before_close_normal'
+                },
+                component: () => import('@/view/argu-page/params.vue')
+            },
+            {
+                path: 'query',
+                name: 'query',
+                meta: {
+                    icon: 'md-flower',
+                    title: route => `{{ query }}-${route.query.id}`,
+                    notCache: true
+                },
+                component: () => import('@/view/argu-page/query.vue')
+            }
+        ]
     },
-    component: Main,
-    children: [
-      {
-        path: 'params/:id',
-        name: 'params',
+    {
+        path: '/401',
+        name: 'error_401',
         meta: {
-          icon: 'md-flower',
-          title: route => `{{ params }}-${route.params.id}`,
-          notCache: true,
-          beforeCloseName: 'before_close_normal'
+            hideInMenu: true
         },
-        component: () => import('@/view/argu-page/params.vue')
-      },
-      {
-        path: 'query',
-        name: 'query',
+        component: () => import('@/view/error-page/401.vue')
+    },
+    {
+        path: '/500',
+        name: 'error_500',
         meta: {
-          icon: 'md-flower',
-          title: route => `{{ query }}-${route.query.id}`,
-          notCache: true
+            hideInMenu: true
         },
-        component: () => import('@/view/argu-page/query.vue')
-      }
-    ]
-  },
-  {
-    path: '/401',
-    name: 'error_401',
-    meta: {
-      hideInMenu: true
+        component: () => import('@/view/error-page/500.vue')
     },
-    component: () => import('@/view/error-page/401.vue')
-  },
-  {
-    path: '/500',
-    name: 'error_500',
-    meta: {
-      hideInMenu: true
-    },
-    component: () => import('@/view/error-page/500.vue')
-  },
-  {
-    path: '*',
-    name: 'error_404',
-    meta: {
-      hideInMenu: true
-    },
-    component: () => import('@/view/error-page/404.vue')
-  }
+    {
+        path: '*',
+        name: 'error_404',
+        meta: {
+            hideInMenu: true
+        },
+        component: () => import('@/view/error-page/404.vue')
+    }
 ]
