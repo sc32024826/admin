@@ -20,8 +20,6 @@ export default {
             // 核心的就是这里了
             await applicationUserManager.signinRedirectCallback()
             let user = await applicationUserManager.getUser()
-            console.log(user)
-            debugger
             // 将 token 存储在客户端
             this.$store.commit('saveToken', user.access_token)
             // 调整首页
