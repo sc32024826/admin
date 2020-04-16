@@ -8,6 +8,7 @@
 </template>
 <script>
 import applicationUserManager from '../Auth/applicationusermanager'
+// import axios from 'axios'
 
 export default {
     name: 'logincallback-view',
@@ -20,6 +21,19 @@ export default {
             // 核心的就是这里了
             await applicationUserManager.signinRedirectCallback()
             let user = await applicationUserManager.getUser()
+            // console.log('===========USER====================')
+            // console.log(user)
+            // axios.get('https://protal.servers.mchains.cn/connect/userinfo', {
+            //     headers: { 'Content-Type': 'application/json' },
+            //     params: {
+            //         Authorization: 'Bearer ' + user
+            //     }
+
+            // }).then(res => {
+            //     console.log(res)
+            // }).catch(err => {
+            //     console.log(err)
+            // })
             // 将 token 存储在客户端
             this.$store.commit('saveToken', user.access_token)
             // 调整首页

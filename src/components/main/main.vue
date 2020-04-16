@@ -79,6 +79,7 @@ export default {
     tagRouter () {
       return this.$store.state.app.tagRouter
     },
+    // 用户头像
     userAvatar () {
       return this.$store.state.user.avatarImgPath
     },

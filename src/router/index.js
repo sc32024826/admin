@@ -26,7 +26,7 @@ router.beforeEach((to, from, next) => {
         if (ss && ss !== 'undefined') {
             // 通过vuex state获取当前的token是否存在
             console.log('token 已存在')
-            // console.log(storeTemp.state.token)
+            console.log(storeTemp.state.token)
             next()
         } else {
             console.log('认证')
