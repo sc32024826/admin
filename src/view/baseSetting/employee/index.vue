@@ -40,6 +40,27 @@
         <Modal v-model="bDelete" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete" @on-cancel="bDelete = false">
             <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
         </Modal>
+        <Modal v-model="bEdit" title="编辑员工信息" @on-ok="confirmToEdit">
+            <Form :model="formData">
+                <Row :gutter="32">
+                    <Col span="24">
+                    <FormItem label="员工工号" label-position="top">
+                        <Input v-model="formData.id" placeholder="请输入员工工号" />
+                    </FormItem>
+                    </Col>
+                    <Col span="24">
+                    <FormItem label="员工姓名" label-position="top">
+                        <Input v-model="formData.name" placeholder="请输入员工姓名" />
+                    </FormItem>
+                    </Col>
+                    <Col span="24">
+                    <FormItem label="员工部门" label-position="top">
+                        <Input v-model="formData.department" placeholder="请输入员工部门" />
+                    </FormItem>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
     </div>
 </template>
 <script>
@@ -98,9 +119,11 @@ export default {
             ],
             drawer_new_em: false,
             bDelete: false,
+            bEdit: false, // 修改员工信息
             formData: {
                 id: '',
-                name: ''
+                name: '',
+                depart: ''
             },
             selection: [],
             departmentList: [],
@@ -216,12 +239,12 @@ export default {
         // 修改操作
         editEmployeeInfo (data) {
             console.log(data)
-            // 关键字段
-            // params.row.id
-            // 修改成
-            // params.value
-
-            // 调用axios 更新数据源
+            this.formData = data
+            this.bEdit = true
+        },
+        confirmToEdit () {
+            // 提交数据
+            // this.formData
         }
     },
     mounted () {

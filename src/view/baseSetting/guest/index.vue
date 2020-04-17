@@ -41,6 +41,32 @@
         <Modal v-model="bDelete" title="您确认要删除以下内容吗?" @on-ok="confirmToDelete" @on-cancel="bDelete = false">
             <Table :columns="wannaDelete.columns" :data="wannaDelete.data"></Table>
         </Modal>
+        <Modal v-model="bedit" title="客户信息修改" @on-ok="confirmToEdit">
+            <Form :model="OBinfo">
+                <Row :gutter="32">
+                    <Col span="24">
+                    <FormItem label="客户简称" label-position="top">
+                        <Input v-model="OBinfo.nichen" placeholder="请输入客户简称"></Input>
+                    </FormItem>
+                    </Col>
+                    <Col span="24">
+                    <FormItem label="客户全称" label-position="top">
+                        <Input v-model="OBinfo.name" placeholder="请输入客户全称"></Input>
+                    </FormItem>
+                    </Col>
+                    <Col span="24">
+                    <FormItem label="联系人姓名" label-position="top">
+                        <Input v-model="OBinfo.contact" placeholder="请输入联系人姓名"></Input>
+                    </FormItem>
+                    </Col>
+                    <Col span="24">
+                    <FormItem label="联系人电话" label-position="top">
+                        <Input v-model="OBinfo.tel" placeholder="请输入联系人电话"></Input>
+                    </FormItem>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
     </div>
 </template>
 
@@ -70,16 +96,27 @@ export default {
                     key: 'action',
                     align: 'center',
                     render: (h, params) => {
-                        return h('Button',
+                        return [h('Button',
                             {
-                                props: { type: 'error' },
-                                style: {},
+                                props: { type: 'warning', size: 'small' },
+                                style: { margin: '2px' },
+                                on: {
+                                    click: () => {
+                                        this.editObject(params.row)
+                                    }
+                                }
+                            }, '编辑'),
+                        h('Button',
+                            {
+                                props: { type: 'error', size: 'small' },
+                                style: { margin: '2px' },
                                 on: {
                                     click: () => {
                                         this.deleteObject(params.row)
                                     }
                                 }
                             }, '删除')
+                        ]
                     }
                 }
             ],
@@ -97,7 +134,9 @@ export default {
                 ],
                 data: []
             },
-            exportLoading: false
+            exportLoading: false,
+            OBinfo: {},
+            bedit: false
         }
     },
     methods: {
@@ -189,14 +228,13 @@ export default {
             that.wannaDelete.data = []
         },
         // 修改操作
-        paramsEdit (params) {
+        editObject (params) {
             console.log(params)
-            // 关键字段
-            // params.row.id
-            // 修改成
-            // params.value
+            this.OBinfo = params
+            this.bedit = true
+        },
+        confirmToEdit () {
 
-            // 调用axios 更新数据源
         }
     },
     mounted () {
