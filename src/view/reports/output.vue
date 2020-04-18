@@ -11,8 +11,9 @@
                     <Radio label="7天" border></Radio>
                     <Radio label="自定义" border></Radio>
                 </RadioGroup>
-                <DatePicker type="daterange" placement="bottom-end" placeholder="选择时间段" style="width: 200px" v-if="showme" v-model="condition.dateRange"></DatePicker>
+                <DatePicker type="daterange" split-panels placement="bottom-end" placeholder="选择时间段" style="width: 200px" v-if="showme" v-model="condition.dateRange"></DatePicker>
                 <Button type="primary" class="selectBtn" @click="filtrate" icon="md-reorder">筛选</Button>
+                <Button type="primary" class="selectBtn" @click="reset" icon="md-refresh">重置</Button>
             </Form>
         </div>
         <Tables :columns="columns" v-model="tableData" border stripe :loading="loading" searchable search-place="top" />
@@ -31,7 +32,7 @@
 import { getReportsData } from '@/api/data'
 import Tables from '_c/tables'
 import excel from '@/libs/excel'
-import { dateFormat } from '@/api/utils'
+import { dateFormat, dateAdd } from '@/api/utils'
 
 export default {
     name: 'report',
@@ -49,7 +50,7 @@ export default {
                 { title: '员工', key: 'employee', align: 'center' },
                 { title: '客户', key: 'guest', align: 'center' },
                 { title: '机器号', key: 'meachine', align: 'center' },
-                { title: '日期', key: 'date', align: 'center' }
+                { title: '日期', key: 'date', align: 'center', sortable: true }
             ],
             tableData: [],
             exportLoading: false,
@@ -61,15 +62,17 @@ export default {
             totalData: [], // 未分页总数据
             dataCount: 0, // 表格数据量
             currentPage: 1, // 当前分页码
-            pageSize: 10 // 每页显示数量
+            pageSize: 10, // 每页显示数量
+            totalData_bak: {} // 结果集备份
         }
     },
     mounted () {
         getReportsData().then(res => {
             this.totalData = res.data
+            this.totalData_bak = res.data
             this.loading = false
             this.dataCount = res.data.length
-            this.tableData = this.pageData()
+            this.tableData = this.pageData(this.totalData)
         })
     },
     methods: {
@@ -109,6 +112,7 @@ export default {
                 return
             }
             let date = this.condition2
+            let today = dateFormat('YYYY-mm-dd', new Date())
             if (!this.condition2) {
                 this.$Message.error('请选择日期!')
                 return
@@ -116,12 +120,17 @@ export default {
                 switch (this.condition2) {
                     case '当日':
                         console.log('当日')
+                        console.log(today)
                         break
                     case '昨天':
                         console.log('昨天')
+                        let yestday = dateAdd(new Date(), -1)
+                        this.tableData = this.tableData.filter(item => item.date >= yestday && item.date < today)
                         break
                     case '7天':
                         console.log('7天')
+                        let week = dateAdd(new Date(), -7)
+                        this.tableData = this.tableData.filter(item => item.date >= week && item.date < today)
                         break
                     case '自定义':
                         if (this.condition.dateRange[0] === '') {
@@ -129,6 +138,13 @@ export default {
                             return
                         } else {
                             date = this.condition.dateRange
+                            let start = dateFormat('YYYY-mm-dd', date[0])
+                            let end = dateFormat('YYYY-mm-dd', date[1])
+                            console.log(start, end)
+                            this.totalData = this.totalData.filter(item => item.date >= start && item.date < end)
+                            // this.totalData = this.tableData
+                            this.dataCount = this.totalData.length
+                            this.tableData = this.pageData(this.totalData)
                         }
                         break
                 }
@@ -163,13 +179,12 @@ export default {
             this.tableData = this.totalData.slice(_start, _end)
         },
         // 表格数据分页处理
-        pageData () {
+        pageData (total) {
             let data = []
             if (this.dataCount < this.pageSize) {
-                data = this.totalData
+                data = total
             } else {
-                console.log(this.totalData)
-                data = this.totalData.slice(0, this.pageSize)
+                data = total.slice(0, this.pageSize)
             }
             return data
         },
@@ -178,6 +193,11 @@ export default {
             this.pageSize = val
             // 修改每页显示数量之后 需要重新更新数据表
             this.tableData = this.totalData.slice(0, val)
+        },
+        // 重置筛选结果
+        reset () {
+            this.dataCount = this.totalData_bak.length
+            this.tableData = this.pageData(this.totalData_bak)
         }
     },
     computed: {
