@@ -202,5 +202,26 @@ export default [
             hideInMenu: true
         },
         component: () => import('@/view/error-page/404.vue')
+    },
+    {
+        path: '/Sampletrack',
+        name: '样板跟踪',
+        meta: {
+            icon: 'ios-stats',
+            title: '统计报表',
+            requireAuth: true
+        },
+        component: Main,
+        children: [
+            {
+                path: 'Sampletrack',
+                name: '样板跟踪',
+                meta: {
+                    icon: 'md-pulse',
+                    title: '样板跟踪'
+                },
+                component: () => import('@/view/reports/SampleTrack.vue')
+            }
+        ]
     }
 ]
