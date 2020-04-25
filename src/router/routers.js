@@ -204,8 +204,8 @@ export default [
         component: () => import('@/view/error-page/404.vue')
     },
     {
-        path: '/Sampletrack',
-        name: '样板跟踪',
+        path: '/FinelReport',
+        name: 'FinelReport',
         meta: {
             icon: 'ios-stats',
             title: '统计报表',
@@ -215,7 +215,7 @@ export default [
         children: [
             {
                 path: 'Sampletrack',
-                name: '样板跟踪',
+                name: 'st',
                 meta: {
                     icon: 'md-pulse',
                     title: '样板跟踪'

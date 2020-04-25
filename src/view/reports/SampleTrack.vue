@@ -1,16 +1,22 @@
 <template>
     <div>
         <div>
-            <Form :model="condition">
-                <RadioGroup v-model="condition">
-                    <Radio label="待生产" border></Radio>
-                    <Radio label="生产中" border default></Radio>
-                    <Radio label="已完成" border></Radio>
-                </RadioGroup><Button type="primary" class="selectBtn" @click="filtrate" icon="md-reorder">筛选</Button>
-                <Button type="primary" class="selectBtn" @click="reset" icon="md-refresh">重置</Button>
+            <Form :model="formdata" label-position="left">
+                <FormItem class="fi">
+                    <RadioGroup v-model="formdata.condition">
+                        <Radio label="待生产" border></Radio>
+                        <Radio label="生产中" border default></Radio>
+                        <Radio label="已完成" border></Radio>
+                    </RadioGroup><Button type="primary" class="selectBtn" @click="filtrate" icon="md-reorder">筛选</Button>
+                    <Button type="primary" class="selectBtn" @click="reset" icon="md-refresh">重置</Button>
+                </FormItem>
+                <FormItem class="fi">
+                    <Input v-model="formdata.SampleNO" placeholder="版单号" class="search-input" />
+                    <Button type="primary" icon="md-search" class="search-btn" @click="searchBySampleNo">&nbsp;&nbsp;搜索</Button>
+                </FormItem>
             </Form>
         </div>
-        <Tables ref="tables" :loading="loading" stripe searchable search-place="top" v-model="tableData" :columns="columns" />
+        <Tables ref="tables" :loading="loading" stripe v-model="tableData" :columns="columns" />
         <div style="margin: 10px;overflow: hidden">
             <div style="float: left;">
                 <Page :total="dataCount" :current="currentPage" @on-change="changePage" @on-page-size-change="sizeSetter" show-sizer :page-size="pageSize"></Page>
@@ -20,7 +26,7 @@
 </template>
 <script>
 import Tables from '_c/tables'
-
+import './index.less'
 export default {
     name: 'SampleTrack',
     components: { Tables },
@@ -61,7 +67,10 @@ export default {
             currentPage: 1, // 当前分页码
             pageSize: 10, // 每页显示数量
             totalData_bak: {}, // 结果集备份
-            condition: '生产中'
+            formdata: {
+                condition: '生产中',
+                SampleNO: ''
+            }
         }
     },
     created () {
@@ -103,7 +112,27 @@ export default {
         reset () {
             this.dataCount = this.totalData_bak.length
             this.tableData = this.pageData(this.totalData_bak)
+        },
+        filtrate () {
+            console.log('1')
+        },
+        searchBySampleNo () {
+
         }
     }
 }
 </script>
+<style>
+.selectBtn {
+    margin-left: 2px;
+}
+.search-input {
+    width: 200px;
+}
+.search-btn {
+    margin-left: 10px;
+}
+.fi {
+    margin-bottom: 5px;
+}
+</style>
